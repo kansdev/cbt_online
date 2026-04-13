@@ -22,19 +22,8 @@
                     </thead>
                     <tbody>
                          @foreach ($data as $d)
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $d['nama'] }}</td>
-                                <td class="text-success fw-bold">{{ $d['benar'] }}</td>
-                                <td class="text-danger fw-bold">{{ $d['salah'] }}</td>
-                                <td class="fw-bold">{{ $d['nilai'] }}</td>
-                                <td>
-                                    <a href="#detailJawaban{{ $d['id_siswa'] }}"
-                                    class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#detailJawaban{{ $d['id_siswa'] }}">
-                                    Detail
-                                    </a>
-                                </td>
-                            </tr>
+                         {{ $d['id_siswa'] }}
+                         {{ isset($detail_jawaban[$d['id_siswa']]) ? 'ADA' : 'TIDAK ADA' }}
                         @endforeach
                     </tbody>
                 </table>
