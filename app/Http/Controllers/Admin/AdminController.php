@@ -43,10 +43,10 @@ class AdminController extends Controller
             ->groupBy('id_siswa')
             ->map(function($item) {
                 return [
-                    'nama' => $item->account->name ?? '-',
-                    'pertanyaan' => $item->soals->pertanyaan,
-                    'jawaban' => $item->jawaban,
-                    'kunci_jawaban' => $item->soal->kunci_jawaban
+                    'nama' => $item[0]->account->name,
+                    'pertanyaan' => $item[0]->soal->pertanyaan,
+                    'jawaban' => $item[0]->jawaban,
+                    'kunci_jawaban' => $item[0]->soal->kunci_jawaban
                 ];
             });
 
