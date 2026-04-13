@@ -38,7 +38,7 @@ class AdminController extends Controller
             ->get()
             ->groupBy('id_siswa');
 
-        $detail_jawaban = Jawaban::with(['soals', 'accounts'])
+        $detail_jawaban = Jawaban::with(['soal', 'account'])
             ->get()
             ->groupBy('id_siswa')
             ->map(function($item) {
