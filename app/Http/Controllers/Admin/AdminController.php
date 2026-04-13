@@ -40,7 +40,10 @@ class AdminController extends Controller
 
         $detail_jawaban = Jawaban::with(['soal', 'account'])
             ->get()
-            ->groupBy('id_siswa');
+            ->groupBy('id_siswa')
+            ->filter(function ($item) {
+                return $item->count() > 0;
+            });
 
 
         $data = $jawaban->map(function($item) {
