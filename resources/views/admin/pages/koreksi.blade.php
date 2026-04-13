@@ -50,32 +50,20 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @php
-                                $detail = $detail_jawaban[$d['id_siswa']] ?? collect();
-                            @endphp
-
-                            @if($detail->count() > 0)
-                                @foreach ($detail as $j)
-                                    <tr>
-                                        <td>{{ $j->soal->pertanyaan ?? '-' }}</td>
-                                        <td>{{ $j->jawaban }}</td>
-                                        <td>{{ $j->soal->kunci_jawaban ?? '-' }}</td>
-                                        <td>
-                                            @if ($j->jawaban === $j->soal->kunci_jawaban)
-                                                <span class="badge bg-success">Benar</span>
-                                            @else
-                                                <span class="badge bg-danger">Salah</span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            @else
-                                <tr>
-                                    <td colspan="4" class="text-center text-muted">
-                                        Tidak ada jawaban
-                                    </td>
-                                </tr>
-                            @endif
+                            <tr>
+                                <td>{{ $d['soal'] ?? '-' }}</td>
+                                <td>{{ $d['jawaban'] ?? '-' }}</td>
+                                <td>{{ $d['kunci_jawaban'] ?? '-' }}</td>
+                                <td>
+                                    @if (isset($d['is_correct']))
+                                        @if ($d['is_correct'])
+                                            <span class="badge bg-success">Benar</span>
+                                        @else
+                                            <span class="badge bg-danger">Salah</span>
+                                        @endif
+                                    @endif
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

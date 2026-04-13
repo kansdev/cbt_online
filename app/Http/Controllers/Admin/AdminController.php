@@ -38,13 +38,6 @@ class AdminController extends Controller
             ->get()
             ->groupBy('id_siswa');
 
-        $detail_jawaban = Jawaban::with(['soal', 'account'])
-            ->get()
-            ->groupBy('id_siswa')
-            ->filter(function ($item) {
-                return $item->count() > 0;
-            });
-
 
         $data = $jawaban->map(function($item) {
             $benar = 0;
@@ -69,6 +62,6 @@ class AdminController extends Controller
                 'nilai' => $total > 0 ? round(($benar / $total) * 100, 2) : 0
             ];
         });
-        return view('admin.pages.koreksi', compact('data', 'detail_jawaban'));
+        return view('admin.pages.koreksi', compact('data'));
     }
 }
