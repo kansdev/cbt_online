@@ -14,7 +14,7 @@ class AdminController extends Controller
 {
     public function index()
     {
-        $peserta = Account::count();        
+        $peserta = Account::count();
         return view('admin.pages.beranda', compact('peserta'));
     }
 
@@ -24,7 +24,7 @@ class AdminController extends Controller
         return view('admin.pages.peserta', compact('peserta'));
     }
 
-    public function soal() 
+    public function soal()
     {
         $soal = Soal::all();
         return view('admin.pages.soal', compact('soal'));
@@ -40,15 +40,16 @@ class AdminController extends Controller
 
         $detail_jawaban = Jawaban::with(['soal', 'account'])
             ->get()
+            ->groupBy('id_siswa')
             ->map(function($item) {
                 return [
-                    'nama' => $item->account->name,
+                    'nama' => $item->account->name ?? '-',
                     'pertanyaan' => $item->soal->pertanyaan,
                     'jawaban' => $item->jawaban,
                     'kunci_jawaban' => $item->soal->kunci_jawaban
                 ];
             });
-        
+
         $data = $jawaban->map(function($item) {
             $benar = 0;
             $salah = 0;

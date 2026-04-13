@@ -29,7 +29,7 @@
                                 <td class="text-danger fw-bold">{{ $d['salah'] }}</td>
                                 <td class="fw-bold">{{ $d['nilai'] }}</td>
                                 <td>
-                                    <a href="#detailJawaban{{ $d['id_siswa'] }}" 
+                                    <a href="#detailJawaban{{ $d['id_siswa'] }}"
                                     class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#detailJawaban{{ $d['id_siswa'] }}">
                                     Detail
                                     </a>
@@ -43,7 +43,7 @@
     </div>
 
     @foreach ($data as $d)
-        <div class="modal fade" id="detailJawaban{{ $d['id_siswa'] }}" tabindex="-1" aria-labelledby="detailJawabanLabel" aria-hidden="true">
+        <div class="modal fade" id="detailJawaban{{ $d['id_siswa'] }}" tabindex="-1" aria-labelledby="detailJawabanLabel{{ $d['id_siswa'] }}" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                 <div class="modal-header">
@@ -61,7 +61,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($detail_jawaban as $j)
+                            @foreach ($detail_jawaban[$d['id_siswa']] ?? [] as $j)
                                 <tr>
                                     <td>{{ $j['pertanyaan'] }}</td>
                                     <td>{{ $j['jawaban'] }}</td>

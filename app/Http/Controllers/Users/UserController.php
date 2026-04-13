@@ -16,21 +16,23 @@ class UserController extends Controller
 {
     public function cek_peserta(Request $request)
     {
-        // Cek nomor registrasi
+        // Cek validasi input
         $validate = $request->validate([
             'nisn' => 'required|numeric'
         ]);
 
+        // Siapkan data siswa berdasarkan nomor account
         $siswa = Account::where('nisn', $validate['nisn'])->first();
+
+        // Format tanggal sekarang
         $datetime = Carbon::now()->format('d F Y, H:i') . ' WIB';
 
+        // Jika data siswa tidak ditemukan, kembalikan response error
         if(!$siswa) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Data anda tidak ditemukan'
-            ], 404);
-        }        
+            return back()->withErrors(['nisn' => 'Peserta dengan NISN ' . $validate['nisn'] . ' tidak ditemukan'])->withInput();
+        }
 
+        // Jika data siswa ditemukan, kembalikan response sukses dengan data siswa
         return view('test.peserta', compact('siswa', 'datetime'));
     }
 
@@ -68,6 +70,7 @@ class UserController extends Controller
             ]);
         }
 
+        // Menyimpan data siswa yang akan mengikuti ujian
         $siswa = Account::findOrFail($id_siswa);
 
         // buat record ujian baru
@@ -86,16 +89,15 @@ class UserController extends Controller
             $ujian->update(['mulai_at' => now()]);
         }
 
-        $soal = SoalAcak::with('soal')->where('id_siswa', $id_siswa)->count(); 
-
+        // Generate soal acak untuk siswa tersebut jika belum ada
+        $soal = SoalAcak::with('soal')->where('id_siswa', $id_siswa)->count();
         if($soal == 0) {
             $this->generate_soal($siswa, 'umum');
         }
 
-        // dd($soal);
-        // return view('test.ujian', compact('siswa'));    
+        // Redirect ke halaman soal
         return redirect()->route('ujian.soal', $id_siswa);
-    }   
+    }
 
     public function halaman_soal($id_siswa)
     {
@@ -110,7 +112,39 @@ class UserController extends Controller
             ]
         );
 
-        // Jika waktu sudah habis maka update ke status ujian selesai 
+        // Cek jika ujian sudah selesai, langsung tampilkan halaman selesai
+        if($ujian->status == 'selesai') {
+            // Hitung jumlah soal
+            $soal = Soal::count();
+
+            // Ambil semua jawaban untuk menghitung skor (opsional, bisa disimpan di tabel lain)
+            $jawaban = Jawaban::with('soal')
+                ->where('id_siswa', $id_siswa)
+                ->get();
+
+            $benar = $jawaban->filter(function($j) {
+                return $j->jawaban == $j->soal->kunci_jawaban;
+            })->count();
+
+            // Total Jawaban
+            $total = $jawaban->count();
+
+            // Jawaban salah
+            $salah = $total - $benar;
+
+            // Nilai skor (misal 100 jika semua benar, 0 jika semua salah)
+            $skor = $total > 0 ? round(($benar / $total) * 100) : 0;
+            return view('test.selesai', [
+                'soal' => $soal,
+                'benar' => $benar,
+                'total' => $total,
+                'salah' => $salah,
+                'skor' => $skor
+            ]);
+        }
+
+
+        // Jika waktu sudah habis maka update ke status ujian selesai
         $waktu_mulai = $ujian->mulai_at;
         $durasi = 60 * 60; // 60 menit
         $sisa_waktu = (int) max(0, $durasi - now()->diffInSeconds($waktu_mulai));
@@ -161,7 +195,7 @@ class UserController extends Controller
         $sisa_detik = $sekarang->diffInSeconds($waktu_selesai, false);
 
         // Jika sisa_detik negatif, artinya waktu sudah habis, maka jadikan 0
-        $hasil_akhir = (int) max(0, $sisa_detik);  
+        $hasil_akhir = (int) max(0, $sisa_detik);
 
         // Jalankan pengecekan tahap (Umum ke Jeda)
         $this->cek_tahap($siswa, $ujian);
@@ -169,14 +203,14 @@ class UserController extends Controller
         // Handel halaman jeda
         // Jika Tahap jeda maka tampilkan halaman jeda
         if($ujian->tahap == 'jeda') {
-            // Cek waktu selesai tahap umum 
+            // Cek waktu selesai tahap umum
             // Jika tidak ada waktu selesai tahap umum, tampilkan halaman jeda
             if(!$ujian->waktu_selesai_umum) {
                 return view('test.jeda');
             }
 
             // Variabel untuk menyimpan waktu selesai tahap umum
-            $selesai = Carbon::parse($ujian->waktu_selesai_umum); 
+            $selesai = Carbon::parse($ujian->waktu_selesai_umum);
             // Cek status ujian jika selesai maka tampilkan halaman selesai atau tampilkan halaman jeda jika belum lewat 60 detik
             if(now()->diffInSeconds($selesai, false) < 60) {
                 // cek status jika sudah selesai maka tampilkan halaman selesai
@@ -219,14 +253,14 @@ class UserController extends Controller
             // jika sudah lewat 60 detik maka lanjut ke tahap kejuruan
             // Update tahap ke kejuruan
             $ujian->update(['tahap' => 'kejuruan']);
-            
+
             // Generat soal kejuruan jika belum ada
             if(SoalAcak::with('soal')
                 ->where('id_siswa', $siswa->id)
                 ->where('tahap', 'kejuruan')
                 ->count() == 0) {
                 $this->generate_soal($siswa, 'kejuruan');
-            }           
+            }
 
             return redirect()->route('ujian.soal', $id_siswa);
         }
@@ -234,7 +268,7 @@ class UserController extends Controller
         // Soal berikutnya berdasarkan jumlah jawaban yang sudah dijawab
         $jumlah_jawab = Jawaban::where('id_siswa', $id_siswa)
             ->where('tahap', $ujian->tahap)
-            ->count();  
+            ->count();
         $soal_acak = SoalAcak::with('soal')
             ->where('id_siswa', $id_siswa)
             ->where('tahap', $ujian->tahap)
@@ -316,7 +350,7 @@ class UserController extends Controller
                     'waktu_selesai_umum' => now()
                 ]);
 
-                return;                
+                return;
             }
         }
 
@@ -376,7 +410,7 @@ class UserController extends Controller
         if($tahap == 'kejuruan') {
             if ($jurusan == 'RPL') {
                 return ['rpl'];
-            } 
+            }
         }
 
         return [];
@@ -395,6 +429,23 @@ class UserController extends Controller
         $durasi = 60 * 60; // 60 menit
         $sisa_waktu = (int) max(0, $durasi - now()->diffInSeconds($ujian->mulai_at));
 
+        // Blok kalau waktu sudah habis, tapi masih ada request untuk menyimpan jawaban
+        if($sisa_waktu <= 0 || $ujian->status == 'selesai') {
+            // Update status ujian ke selesai jika belum selesai
+            if($ujian->status != 'selesai') {
+                $ujian->update([
+                    'status' => 'selesai',
+                    'selesai_at' => now()
+                ]);
+            }
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Waktu habis, ujian sudah selesai'
+            ], 400);
+        }
+
+        // Jika waktu habis, tidak bisa menyimpan jawaban
         if ($sisa_waktu <= 0) {
             return response()->json([
                 'status' => false,
@@ -437,6 +488,6 @@ class UserController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Ujian berhasil direset'
-        ]); 
+        ]);
     }
 }
