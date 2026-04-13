@@ -21,9 +21,19 @@
                         </tr>
                     </thead>
                     <tbody>
-                         @foreach ($data as $d)
-                         {{ $d['id_siswa'] }}
-                         {{ isset($detail_jawaban[$d['id_siswa']]) ? 'ADA' : 'TIDAK ADA' }}
+                        @foreach ($data as $index => $d)
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+                                <td>{{ $d['nama'] }}</td>
+                                <td>{{ $d['benar'] }}</td>
+                                <td>{{ $d['salah'] }}</td>
+                                <td>{{ $d['nilai'] }}%</td>
+                                <td>
+                                    <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#detailJawaban{{ $d['id_siswa'] }}">
+                                        Detail
+                                    </button>
+                                </td>
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>
