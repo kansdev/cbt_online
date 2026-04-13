@@ -34,19 +34,19 @@ class AdminController extends Controller
     public function koreksi()
     {
         // $ujian = Ujian::findOrFail($id);
-        $jawaban = Jawaban::with(['soal', 'account'])
+        $jawaban = Jawaban::with(['soals', 'accounts'])
             ->get()
             ->groupBy('id_siswa');
 
-        $detail_jawaban = Jawaban::with(['soal', 'account'])
+        $detail_jawaban = Jawaban::with(['soals', 'accounts'])
             ->get()
             ->groupBy('id_siswa')
             ->map(function($item) {
                 return [
-                    'nama' => $item->account->name ?? '-',
-                    'pertanyaan' => $item->soal->pertanyaan,
+                    'nama' => $item->accounts->name ?? '-',
+                    'pertanyaan' => $item->soals->pertanyaan,
                     'jawaban' => $item->jawaban,
-                    'kunci_jawaban' => $item->soal->kunci_jawaban
+                    'kunci_jawaban' => $item->soals->kunci_jawaban
                 ];
             });
 
