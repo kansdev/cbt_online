@@ -61,7 +61,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($detail_jawaban[$d['id_siswa']] ?? [] as $j)
+                            {{ dd($datail_jawaban) }}
+                            {{-- @foreach ($detail_jawaban[$d['id_siswa']] ?? [] as $j)
                                 <tr>
                                     <td>{{ $j->soal->pertanyaan }}</td>
                                     <td>{{ $j->jawaban }}</td>
@@ -74,7 +75,7 @@
                                         @endif
                                     </td>
                                 </tr>
-                            @endforeach
+                            @endforeach --}}
                         </tbody>
                     </table>
                 </div>
