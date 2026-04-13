@@ -41,8 +41,8 @@
         </div>
     </div>
 
-    @foreach ($data as $d)
-        <div class="modal fade" id="detailJawaban{{ $d['id_siswa'] }}" tabindex="-1" aria-labelledby="detailJawabanLabel{{ $d['id_siswa'] }}" aria-hidden="true">
+    @foreach ($details as $detail)
+        <div class="modal fade" id="detailJawaban{{ $detail['id_siswa'] }}" tabindex="-1" aria-labelledby="detailJawabanLabel{{ $detail['id_siswa'] }}" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                 <div class="modal-header">
@@ -60,20 +60,20 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>{{ $d['soal'] ?? '-' }}</td>
-                                <td>{{ $d['jawaban'] ?? '-' }}</td>
-                                <td>{{ $d['kunci_jawaban'] ?? '-' }}</td>
-                                <td>
-                                    @if (isset($d['is_correct']))
-                                        @if ($d['is_correct'])
+                            @foreach ($detail['jawaban'] as $jawaban)
+                                <tr>
+                                    <td>{{ $jawaban['pertanyaan'] }}</td>
+                                    <td>{{ $jawaban['jawaban'] }}</td>
+                                    <td>{{ $jawaban['kunci_jawaban'] }}</td>
+                                    <td>
+                                        @if ($jawaban['jawaban'] === $jawaban['kunci_jawaban'])
                                             <span class="badge bg-success">Benar</span>
                                         @else
                                             <span class="badge bg-danger">Salah</span>
                                         @endif
-                                    @endif
-                                </td>
-                            </tr>
+                                    </td>
+                                </tr>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>

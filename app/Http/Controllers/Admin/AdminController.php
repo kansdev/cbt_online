@@ -38,6 +38,21 @@ class AdminController extends Controller
             ->get()
             ->groupBy('id_siswa');
 
+        $details = $jawaban->map(function($item) {
+            return [
+                'id_siswa' => $item[0]->id_siswa,
+                'nama' => $item[0]->account->name,
+                'jawaban' => $item->map(function($j) {
+                    return [
+                        'soal' => $j->soal->pertanyaan,
+                        'jawaban' => $j->jawaban,
+                        'kunci_jawaban' => $j->soal->kunci_jawaban,
+                        'status' => $j->jawaban == $j->soal->kunci_jawaban ? 'benar' : 'salah'
+                    ];
+                })
+            ];
+        });
+
 
         $data = $jawaban->map(function($item) {
             $benar = 0;
@@ -62,6 +77,6 @@ class AdminController extends Controller
                 'nilai' => $total > 0 ? round(($benar / $total) * 100, 2) : 0
             ];
         });
-        return view('admin.pages.koreksi', compact('data'));
+        return view('admin.pages.koreksi', compact('data', 'details'));
     }
 }

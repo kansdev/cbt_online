@@ -6,7 +6,7 @@
         <title>Admin Dashboard - Bootstrap 5.3</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-        
+
         <style>
             :root {
                 --sidebar-bg: #1e293b; /* Slate 800 */
@@ -114,7 +114,7 @@
             <div class="sidebar-heading border-bottom border-secondary border-opacity-25">
                 <i class="bi bi-cpu-fill me-2"></i> <strong>CBT</strong> Online
             </div>
-        
+
             <div class="list-group list-group-flush mt-3">
                 <div class="menu-label">Menu Utama</div>
                 <a class="list-group-item list-group-item-action bg-transparent @if (Route::currentRouteName() == 'admin.index') active @endif" href="{{ route('admin.index') }}">
@@ -154,7 +154,7 @@
                     <button class="btn btn-outline-dark btn-sm" id="sidebarToggle">
                         <i class="bi bi-list"></i>
                     </button>
-                    
+
                     <div class="ms-auto d-flex align-items-center">
                         <div class="dropdown">
                             <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark" data-bs-toggle="dropdown">
