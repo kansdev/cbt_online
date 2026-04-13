@@ -34,7 +34,7 @@ class AdminController extends Controller
     public function koreksi()
     {
         // $ujian = Ujian::findOrFail($id);
-        $jawaban = Jawaban::with(['soals', 'accounts'])
+        $jawaban = Jawaban::with(['soal', 'account'])
             ->get()
             ->groupBy('id_siswa');
 
