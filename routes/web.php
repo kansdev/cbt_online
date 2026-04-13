@@ -2,6 +2,15 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Users\UserController;
+use App\Http\Controllers\Admin\AdminController;
+
+Route::prefix('apps_ade')->group(function() {
+    Route::get('/', [AdminController::class, 'index'])->name('admin.index');
+    Route::get('/peserta', [AdminController::class, 'peserta'])->name('admin.peserta');
+    Route::get('/soal', [AdminController::class, 'soal'])->name('admin.soal');
+    Route::get('/koreksi', [AdminController::class, 'koreksi'])->name('admin.koreksi');
+});
+
 
 Route::prefix('ujian')->group(function() {
     Route::get('/', function() {
