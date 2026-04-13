@@ -63,11 +63,11 @@
                         <tbody>
                             @foreach ($detail_jawaban[$d['id_siswa']] ?? [] as $j)
                                 <tr>
-                                    <td>{{ $j['pertanyaan'] }}</td>
-                                    <td>{{ $j['jawaban'] }}</td>
-                                    <td>{{ $j['kunci_jawaban'] }}</td>
+                                    <td>{{ $j->soal->pertanyaan }}</td>
+                                    <td>{{ $j->jawaban }}</td>
+                                    <td>{{ $j->soal->kunci_jawaban }}</td>
                                     <td>
-                                        @if ($j['jawaban'] == $j['kunci_jawaban'])
+                                        @if ($j->jawaban === $j->soal->kunci_jawaban)
                                             <span class="badge bg-success">Benar</span>
                                         @else
                                             <span class="badge bg-danger">Salah</span>
