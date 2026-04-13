@@ -21,32 +21,21 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @php
-                            $detail = $detail_jawaban[$d['id_siswa']] ?? collect();
-                        @endphp
-
-                        @if($detail->count() > 0)
-                            @foreach ($detail as $j)
-                                <tr>
-                                    <td>{{ $j->soal->pertanyaan ?? '-' }}</td>
-                                    <td>{{ $j->jawaban }}</td>
-                                    <td>{{ $j->soal->kunci_jawaban ?? '-' }}</td>
-                                    <td>
-                                        @if ($j->jawaban === $j->soal->kunci_jawaban)
-                                            <span class="badge bg-success">Benar</span>
-                                        @else
-                                            <span class="badge bg-danger">Salah</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
-                        @else
+                         @foreach ($data as $d)
                             <tr>
-                                <td colspan="4" class="text-center text-muted">
-                                    Tidak ada jawaban
+                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $d['nama'] }}</td>
+                                <td class="text-success fw-bold">{{ $d['benar'] }}</td>
+                                <td class="text-danger fw-bold">{{ $d['salah'] }}</td>
+                                <td class="fw-bold">{{ $d['nilai'] }}</td>
+                                <td>
+                                    <a href="#detailJawaban{{ $d['id_siswa'] }}"
+                                    class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#detailJawaban{{ $d['id_siswa'] }}">
+                                    Detail
+                                    </a>
                                 </td>
                             </tr>
-                        @endif
+                        @endforeach
                     </tbody>
                 </table>
             </div>
@@ -72,21 +61,32 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {{ dd($detail_jawaban) }}
-                            {{-- @foreach ($detail_jawaban[$d['id_siswa']] ?? [] as $j)
+                            @php
+                                $detail = $detail_jawaban[$d['id_siswa']] ?? collect();
+                            @endphp
+
+                            @if($detail->count() > 0)
+                                @foreach ($detail as $j)
+                                    <tr>
+                                        <td>{{ $j->soal->pertanyaan ?? '-' }}</td>
+                                        <td>{{ $j->jawaban }}</td>
+                                        <td>{{ $j->soal->kunci_jawaban ?? '-' }}</td>
+                                        <td>
+                                            @if ($j->jawaban === $j->soal->kunci_jawaban)
+                                                <span class="badge bg-success">Benar</span>
+                                            @else
+                                                <span class="badge bg-danger">Salah</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @else
                                 <tr>
-                                    <td>{{ $j->soal->pertanyaan }}</td>
-                                    <td>{{ $j->jawaban }}</td>
-                                    <td>{{ $j->soal->kunci_jawaban }}</td>
-                                    <td>
-                                        @if ($j->jawaban === $j->soal->kunci_jawaban)
-                                            <span class="badge bg-success">Benar</span>
-                                        @else
-                                            <span class="badge bg-danger">Salah</span>
-                                        @endif
+                                    <td colspan="4" class="text-center text-muted">
+                                        Tidak ada jawaban
                                     </td>
                                 </tr>
-                            @endforeach --}}
+                            @endif
                         </tbody>
                     </table>
                 </div>
