@@ -70,8 +70,10 @@ class AdminController extends Controller
                 //Jumlah soal yang di jawab
                 $jumlah_soal_acak = SoalAcak::where('id_siswa', $items[0]->id_siswa)->count();
 
-                $nilai = $jumlah_soal_acak > 0
-                    ? round(($benar / $jumlah_soal_acak) * 100, 2)
+                $soal_tidak_dijawab = $jumlah_soal - $jumlah_soal_acak;
+
+                $nilai = $jumlah_soal > 0
+                    ? round(($benar / $jumlah_soal) * 100, 2)
                     : 0;
 
                 return [
