@@ -14,8 +14,10 @@
                         <tr>
                             <th>No</th>
                             <th>Nama</th>
+                            <th>Jumlah Soal</th>
                             <th>Benar</th>
                             <th>Salah</th>
+                            <th>Tidak di jawab</th>
                             <th>Nilai</th>
                             <th>Detail</th>
                         </tr>
@@ -25,8 +27,10 @@
                             <tr>
                                 <td>{{ $index + 1 }}</td>
                                 <td>{{$d['name']}}</td>
+                                <td>{{$d['jumlah_soal']}}</td>
                                 <td>{{$d['benar']}}</td>
                                 <td>{{$d['salah']}}</td>
+                                <td>{{$d['jumlah_soal'] - $d['jumlah_soal_acak']}}</td>
                                 <td>{{$d['nilai']}}</td>
                                 <td>
                                     <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#detailJawaban{{ $d['id_siswa'] }}">
