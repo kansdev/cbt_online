@@ -9,7 +9,7 @@
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover table-striped table-bordered mb-0">
+                <table class="table table-hover table-striped table-bordered mb-0" id="dataTable">
                     <thead class="table-light">
                         <tr>
                             <th>No</th>
@@ -21,16 +21,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($data as $index => $d)
+                        @foreach ($detail_jawaban as $index => $d)
                             <tr>
                                 <td>{{ $index + 1 }}</td>
-                                <td>{{ $d['nama'] }}</td>
-                                <td>{{ $d['benar'] }}</td>
-                                <td>{{ $d['salah'] }}</td>
-                                <td>{{ $d['nilai'] }}%</td>
+                                <td>{{$d['name']}}</td>
+                                <td>{{$d['benar']}}</td>
+                                <td>{{$d['salah']}}</td>
+                                <td>{{$d['nilai']}}</td>
                                 <td>
-                                    <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#detailJawaban{{ $d['id_siswa'] }}">
-                                        Detail
+                                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#detailJawaban{{ $d['id_siswa'] }}">
+                                        Lihat Detail
                                     </button>
                                 </td>
                             </tr>
@@ -41,43 +41,48 @@
         </div>
     </div>
 
-    @foreach ($details as $detail)
-        <div class="modal fade" id="detailJawaban{{ $detail['id_siswa'] }}" tabindex="-1" aria-labelledby="detailJawabanLabel{{ $detail['id_siswa'] }}" aria-hidden="true">
+    @foreach ($detail_jawaban as $d)
+        <div class="modal fade" id="detailJawaban{{ $d['id_siswa'] }}" tabindex="-1" aria-labelledby="detailJawabanLabel{{ $d['id_siswa'] }}" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Detail Jawaban</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Soal</th>
-                                <th>Jawaban Peserta</th>
-                                <th>Kunci Jawaban</th>
-                                <th>Koreksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($detail['jawaban'] as $jawaban)
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="detailJawabanLabel{{ $d['id_siswa'] }}">Detail Jawaban - {{ $d['name'] }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-bordered" id="dataTable">
+                            <thead>
                                 <tr>
-                                    <td>{{ $jawaban['pertanyaan'] }}</td>
-                                    <td>{{ $jawaban['jawaban'] }}</td>
-                                    <td>{{ $jawaban['kunci_jawaban'] }}</td>
-                                    <td>
-                                        @if ($jawaban['jawaban'] === $jawaban['kunci_jawaban'])
-                                            <span class="badge bg-success">Benar</span>
-                                        @else
-                                            <span class="badge bg-danger">Salah</span>
-                                        @endif
-                                    </td>
+                                    <th>Pertanyaan</th>
+                                    <th>Jawaban Siswa</th>
+                                    <th>Kunci Jawaban</th>
+                                    <th>Status</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @foreach ($d['detail'] as $detail)
+                                    <tr>
+                                        <td>{{ $detail['pertanyaan'] }}</td>
+                                        <td>{{ $detail['jawaban'] }}</td>
+                                        <td>{{ $detail['kunci_jawaban'] }}</td>
+                                        <td>
+                                            @if ($detail['jawaban'] === $detail['kunci_jawaban'])
+                                                <span class="badge bg-success">Benar</span>
+                                            @else
+                                                <span class="badge bg-danger">Salah</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    </div>
                 </div>
             </div>
         </div>
     @endforeach
+
 @endsection

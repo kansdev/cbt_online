@@ -9,7 +9,7 @@
         </div>
         <div class="text-end">
             <small class="text-muted d-block">Sisa Waktu</small>
-            <h5 id="timer" class="text-danger fw-bold mb-0">{{ $sisa_waktu }}</h5>
+            <h5 id="timer" class="text-danger fw-bold mb-0"></h5>
         </div>
     </div>
     <!-- Kartu Soal -->
@@ -94,7 +94,7 @@
         }
     </script>
 
-    <script>        
+    <script>
         let sisa = {{ $sisa_waktu }}; // Ini adalah total detik dari PHP
         const display = document.getElementById('timer');
 
