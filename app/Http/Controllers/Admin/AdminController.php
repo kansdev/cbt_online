@@ -67,11 +67,16 @@ class AdminController extends Controller
                 // TOTAL SOAL (bukan jumlah jawaban!)
                 $jumlah_soal = Soal::count();
 
+                $jumlah_jawaban = Jawaban::where('id_siswa', $items[0]->id_siswa)->count();
+
                 //Jumlah soal yang di jawab
                 $jumlah_soal_acak = SoalAcak::where('id_siswa', $items[0]->id_siswa)->count();
 
                 $soal_tidak_dijawab = $jumlah_soal - $jumlah_soal_acak;
-
+                // echo $jumlah_soal; echo "<br>";
+                // echo $jumlah_jawaban; echo "<br>";
+                // echo $jumlah_soal_acak; echo "<br>";
+                // echo $soal_tidak_dijawab; echo "<br>";
                 $nilai = $jumlah_soal > 0
                     ? round(($benar / $jumlah_soal) * 100, 2)
                     : 0;
@@ -82,7 +87,7 @@ class AdminController extends Controller
                     'jumlah_soal' => $jumlah_soal,
                     'benar' => $benar,
                     'salah' => $salah,
-                    'jumlah_soal_acak' => $jumlah_soal_acak,
+                    'soal_tidak_dijawab' => $soal_tidak_dijawab,
                     'nilai' => $nilai,
                     'detail' => $items->map(function($item) {
                         return [
