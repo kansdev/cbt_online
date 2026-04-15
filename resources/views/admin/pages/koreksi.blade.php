@@ -23,9 +23,13 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <@php
+                            $no = 1;
+                        @endphp
                         @foreach ($detail_jawaban as $index => $d)
                             <tr>
-                                <td>{{ $index + 1 }}</td>
+
+                                <td>{{$no++}}</td>
                                 <td>{{$d['name']}}</td>
                                 <td>{{$d['jumlah_soal']}}</td>
                                 <td>{{$d['benar']}}</td>
