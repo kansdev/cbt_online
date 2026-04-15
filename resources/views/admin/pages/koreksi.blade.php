@@ -51,7 +51,7 @@
 
     @foreach ($detail_jawaban as $d)
         <div class="modal fade" id="detailJawaban{{ $d['id_siswa'] }}" tabindex="-1" aria-labelledby="detailJawabanLabel{{ $d['id_siswa'] }}" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
+            <div class="modal-dialog modal-dialog-scrollable modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="detailJawabanLabel{{ $d['id_siswa'] }}">Detail Jawaban - {{ $d['name'] }}</h5>
