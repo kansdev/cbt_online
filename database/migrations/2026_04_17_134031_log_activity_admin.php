@@ -11,13 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('accounts', function (Blueprint $table) {
+        Schema::create('log_activity_admin', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('nisn')->unique();
-            $table->enum('jenis_kelamin', ['Laki-laki', 'Perempuan']);
-            $table->string('jurusan')->nullable();
-            $table->enum('status', ['aktif', 'nonaktif'])->default('nonaktif');
+            $table->text('activity');
+            $table->string('ip_address', 45);
+            $table->string('user_agent')->nullable();
             $table->timestamps();
         });
     }
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('accounts');
+        Schema::dropIfExists('log_activity_admin');
     }
 };

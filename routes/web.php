@@ -9,12 +9,15 @@ Route::prefix('apps_ade')->group(function() {
     Route::get('/peserta', [AdminController::class, 'peserta'])->name('admin.peserta');
     Route::get('/soal', [AdminController::class, 'soal'])->name('admin.soal');
     Route::get('/koreksi', [AdminController::class, 'koreksi'])->name('admin.koreksi');
+    Route::get('/aktif-peserta', [AdminController::class, 'peserta_aktif'])->name('admin.aktif_peserta');
+    Route::get('/riwayat', [AdminController::class, 'riwayat'])->name('admin.riwayat');
+    Route::post('/import-soal', [AdminController::class, 'importSoal'])->name('admin.import-soal');
 });
 
 
 Route::prefix('ujian')->group(function() {
     Route::get('/', function() {
-        return view('test/cek');
+        return view('test.cek');
     })->name('ujian.index');
 
     Route::post('/cek_peserta', [UserController::class, 'cek_peserta'])->name('ujian.cek_peserta');

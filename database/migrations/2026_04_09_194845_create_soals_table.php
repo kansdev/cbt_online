@@ -15,11 +15,12 @@ return new class extends Migration
             $table->id();
             $table->string('kategori');
             $table->text('pertanyaan');
-            $table->string('jawaban_a');
-            $table->string('jawaban_b');
-            $table->string('jawaban_c');
-            $table->string('jawaban_d');            
-            $table->string('jawaban_e');
+            $table->string('gambar')->nullable();
+            $table->string('jawaban_a')->nullable();
+            $table->string('jawaban_b')->nullable();
+            $table->string('jawaban_c')->nullable();
+            $table->string('jawaban_d')->nullable();
+            $table->string('jawaban_e')->nullable();
             $table->char('kunci_jawaban', 1);
             $table->timestamps();
         });

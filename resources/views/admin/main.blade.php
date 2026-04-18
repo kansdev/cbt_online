@@ -21,25 +21,41 @@
                 font-family: 'Inter', sans-serif;
             }
 
+            .container-fluid {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
+            }
+
             #wrapper {
                 display: flex;
+                min-height: 100vh;
                 position: relative;
                 width: 100%;
                 align-items: stretch;
             }
 
             #sidebar-wrapper {
-                min-height: 100vh;
-                min-width: var(--sidebar-width);
-                max-width: var(--sidebar-width);
+                position: fixed;
+                width: var(--sidebar-width);
                 margin-left: -15rem;
                 left: 0;
-                top: 0;
-                height: 100%;
+                top: 32px; /* Height of the navbar */
+                height: calc(100vh - 32px);
+                overflow-y: auto;
+                scrollbar-width: none; /* Firefox */
                 transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 background-color: var(--sidebar-bg);
                 box-shadow: 4px 0 10px rgba(0,0,0,0.1);
                 z-index: 1000;
+            }
+
+            #sidebar-wrapper::-webkit-scrollbar {
+                display: 4px;
+            }
+
+            #sidebar-wrapper::-webkit-scrollbar-thumb {
+                background: rgba(255,255,255,0.2);
+                border-radius: 10px;
             }
 
             /* Logo / Branding */
@@ -96,11 +112,19 @@
             }
 
             #page-content-wrapper {
-                min-width: 100vw;
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                padding-top: 32px;
+                transition: all 0.3s ease;
             }
 
             body.sb-sidenav-toggled #sidebar-wrapper {
                 margin-left: 0;
+            }
+
+            footer {
+                margin-top: auto;
             }
 
             @media (min-width: 768px) {
@@ -108,11 +132,16 @@
                     margin-left: 0;
                 }
                 #page-content-wrapper {
-                    min-width: 0;
-                    width: 100%;
+                    padding-left: var(--sidebar-width);
+                    /* min-width: 0;
+                    width: 100%; */
                 }
                 body.sb-sidenav-toggled #sidebar-wrapper {
                     margin-left: -15rem;
+                }
+
+                body.sb-sidenav-toggled #page-content-wrapper {
+                    padding-left: 0;
                 }
             }
 
@@ -134,12 +163,28 @@
                 .modal-title {
                     font-size: 14px;
                 }
+
+                #sidebar-wrapper {
+                    margin-left: 0;
+                }
+                #page-content-wrapper {
+                    padding-left: 0;
+                    min-width: 0;
+                    width: 100%;
+                }
+                body.sb-sidenav-toggled #sidebar-wrapper {
+                    margin-left: -15rem;
+                }
+
+                body.sb-sidenav-toggled #page-content-wrapper {
+                    margin-left: 0;
+                }
             }
         </style>
     </head>
     <body>
 
-    <div class="d-flex" id="wrapper">
+    <div class="d-flex min-vh-100" id="wrapper">
         <div id="sidebar-wrapper">
             <div class="sidebar-heading border-bottom border-secondary border-opacity-25">
                 <i class="bi bi-cpu-fill me-2"></i> <strong>CBT</strong> Online
@@ -158,7 +203,7 @@
                 </a>
 
                 <div class="menu-label">Pelaksanaan</div>
-                <a class="list-group-item list-group-item-action bg-transparent" href="#!">
+                <a class="list-group-item list-group-item-action bg-transparent" href="{{ route('admin.aktif_peserta') }}">
                     <i class="bi bi-people-fill"></i> Aktif Peserta
                 </a>
                 <a class="list-group-item list-group-item-action bg-transparent" href="#!">
@@ -166,6 +211,10 @@
                 </a>
                 <a class="list-group-item list-group-item-action bg-transparent @if (Route::currentRouteName() == 'admin.koreksi') active @endif" href="{{ route('admin.koreksi') }}">
                     <i class="bi bi-pencil-square"></i> Koreksi
+                </a>
+
+                <a class="list-group-item list-group-item-action bg-transparent @if (Route::currentRouteName() == 'admin.riwayat') active @endif" href="{{ route('admin.riwayat') }}">
+                    <i class="bi bi-clock-history"></i> Riwayat
                 </a>
 
                 <div class="menu-label">Sistem</div>
@@ -179,7 +228,7 @@
         </div>
 
         <div id="page-content-wrapper">
-            <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm">
+            <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm fixed-top">
                 <div class="container-fluid">
                     <button class="btn btn-outline-dark btn-sm" id="sidebarToggle">
                         <i class="bi bi-list"></i>
@@ -204,6 +253,12 @@
             <div class="container-fluid p-4">
                 @yield('content')
             </div>
+
+            <footer class="bg-white border-top py-3 mt-auto shadow-sm ">
+                <div class="container-fluid">
+                    <p class="mb-0 text-center text-muted">&copy; 2023 Your Company. All rights reserved.</p>
+                </div>
+            </footer>
         </div>
     </div>
 

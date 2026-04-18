@@ -10,6 +10,10 @@ use App\Models\Soal;
 use App\Models\SoalAcak;
 use App\Models\Jawaban;
 
+use App\Imports\SoalImport;
+use App\Models\Ujian;
+use Maatwebsite\Excel\Facades\Excel;
+
 class AdminController extends Controller
 {
     public function index()
@@ -73,10 +77,6 @@ class AdminController extends Controller
                 $jumlah_soal_acak = SoalAcak::where('id_siswa', $items[0]->id_siswa)->count();
 
                 $soal_tidak_dijawab = $jumlah_soal - $jumlah_soal_acak;
-                // echo $jumlah_soal; echo "<br>";
-                // echo $jumlah_jawaban; echo "<br>";
-                // echo $jumlah_soal_acak; echo "<br>";
-                // echo $soal_tidak_dijawab; echo "<br>";
                 $nilai = $jumlah_soal > 0
                     ? round(($benar / $jumlah_soal) * 100, 2)
                     : 0;
@@ -100,4 +100,31 @@ class AdminController extends Controller
             });
         return view('admin.pages.koreksi', compact('detail_jawaban', 'jawaban', 'details'));
     }
+
+    // Fungsi untuk menampilkan riwayat ujian peserta
+    public function riwayat()
+    {
+        $riwayat = Ujian::with('account')->get();
+        return view('admin.pages.riwayat', compact('riwayat'));
+    }
+
+    public function peserta_aktif() {
+        $peserta_aktif = Account::all();
+        return view('admin.pages.aktif_peserta', compact('peserta_aktif'));
+    }
+
+    // Fungsi untuk upload soal dari file Excel
+    function importSoal(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        $file = $request->file('file');
+        $import = new SoalImport;
+        Excel::import($import, $file);
+
+        return redirect()->back()->with('success', 'Soal berhasil diimpor!');
+    }
+
 }

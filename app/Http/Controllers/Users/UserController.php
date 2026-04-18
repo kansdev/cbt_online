@@ -12,6 +12,8 @@ use App\Models\Soal;
 use App\Models\Jawaban;
 use App\Models\SoalAcak;
 
+use App\Models\LogsActivityUser;
+
 class UserController extends Controller
 {
     public function cek_peserta(Request $request)
@@ -94,6 +96,14 @@ class UserController extends Controller
         if($soal == 0) {
             $this->generate_soal($siswa, 'umum');
         }
+
+        // Catat aktivitas mulai ujian
+        LogsActivityUser::create([
+            'id_siswa' => $siswa->id,
+            'activity' => 'mulai_ujian',
+            'ip_address' => request()->getClientIp(),
+            'user_agent' => request()->userAgent()
+        ]);
 
         // Redirect ke halaman soal
         return redirect()->route('ujian.soal', $id_siswa);
