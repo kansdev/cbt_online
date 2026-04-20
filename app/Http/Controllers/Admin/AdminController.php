@@ -165,15 +165,20 @@ class AdminController extends Controller
     // Fungsi untuk upload soal dari file Excel
     function importSoal(Request $request)
     {
-        $request->validate([
-            'file' => 'required|mimes:xlsx,xls',
-        ]);
+        try {
+            $request->validate([
+                'file' => 'required|mimes:xlsx,xls,csv',
+            ]);
 
-        $file = $request->file('file');
-        $import = new SoalImport;
-        Excel::import($import, $file);
+            $file = $request->file('file');
+            $import = new SoalImport;
+            Excel::import($import, $file);
 
-        return redirect()->back()->with('success', 'Soal berhasil diimpor!');
+            return redirect()->back()->with('success', 'Soal berhasil diimpor!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('failed', 'Soal gagal diimpor! : ' . $e->getMessage());
+        }
+        
     }
 
     public function reset($id_siswa)

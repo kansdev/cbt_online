@@ -7,6 +7,10 @@
         Upload Soal
     </button>
 
+    @if (session('failed'))
+        <div class="alert alert-danger">{{ session('failed') }}</div>
+    @endif
+
     <div class="card border-0 shadow-sm">
         <div class="card-header bg-white py-3">
             <h4 class="m-0 fw-bold text-primary">Data Soal</h4>
