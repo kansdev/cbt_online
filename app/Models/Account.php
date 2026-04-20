@@ -9,7 +9,8 @@ class Account extends Model
     protected $fillable = [
         'name',
         'nisn',
-        'jurusan'
+        'jurusan',
+        'status'
     ];
 
     public function ujian()

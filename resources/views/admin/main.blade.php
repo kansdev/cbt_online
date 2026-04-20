@@ -206,7 +206,7 @@
                 <a class="list-group-item list-group-item-action bg-transparent" href="{{ route('admin.aktif_peserta') }}">
                     <i class="bi bi-people-fill"></i> Aktif Peserta
                 </a>
-                <a class="list-group-item list-group-item-action bg-transparent" href="#!">
+                <a class="list-group-item list-group-item-action bg-transparent" href="{{ route('admin.reset_peserta') }}">
                     <i class="bi bi-arrow-repeat"></i> Reset Peserta
                 </a>
                 <a class="list-group-item list-group-item-action bg-transparent @if (Route::currentRouteName() == 'admin.koreksi') active @endif" href="{{ route('admin.koreksi') }}">

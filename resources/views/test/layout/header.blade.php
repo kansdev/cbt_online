@@ -61,5 +61,21 @@
                 background-color: #0d6efd;
                 color: white;
             }
+
+            .btn-success {
+                background-color: #28a745;
+                border: none;
+            }
+
+            .btn-secondary {
+                background-color: #6c757d;
+                border: none;
+            }
+
+            .modal-body a {
+                width: 45px;
+                text-align: center;
+                font-weight: bold;
+            }
         </style>
     </head>

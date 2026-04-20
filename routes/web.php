@@ -10,10 +10,14 @@ Route::prefix('apps_ade')->group(function() {
     Route::get('/soal', [AdminController::class, 'soal'])->name('admin.soal');
     Route::get('/koreksi', [AdminController::class, 'koreksi'])->name('admin.koreksi');
     Route::get('/aktif-peserta', [AdminController::class, 'peserta_aktif'])->name('admin.aktif_peserta');
+    Route::get('/reset-peserta', [AdminController::class, 'reset_peserta'])->name('admin.reset_peserta');
     Route::get('/riwayat', [AdminController::class, 'riwayat'])->name('admin.riwayat');
     Route::post('/import-soal', [AdminController::class, 'importSoal'])->name('admin.import-soal');
+    Route::put('/aktif-peserta/aktifkan', [AdminController::class, 'aktifkan_seluruh_peserta'])->name('admin.aktif_peserta.aktif');
+    Route::put('/aktif-peserta/nonaktifkan', [AdminController::class, 'nonaktifkan_seluruh_peserta'])->name('admin.aktif_peserta.nonaktif');
+    Route::get('/aktif-peserta/nonaktifkan-peserta/{id}', [AdminController::class, 'nonaktifkan_peserta'])->name('admin.aktif_peserta.one_nonaktif');
+    Route::get('/reset/{id}', [AdminController::class, 'reset'])->name('admin.reset');
 });
-
 
 Route::prefix('ujian')->group(function() {
     Route::get('/', function() {

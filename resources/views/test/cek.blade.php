@@ -55,8 +55,15 @@
                             <h4 class="fw-bold mb-0">CBT Online</h4>
                             <p class="small mb-0 opacity-75">Silakan masuk untuk memulai</p>
                         </div>
-
+                        
                         <div class="card-body p-4 p-md-5">
+                            @if ($errors->any())
+                                <div class="alert alert-danger">
+                                    @foreach ($errors->all() as $error)
+                                        {{ $error }}
+                                    @endforeach
+                                </div>
+                            @endif
                             <form action="{{ route('ujian.cek_peserta') }}" method="POST">
                                 <div class="mb-4">
                                     <label for="nisn" class="form-label fw-semibold text-muted">Username / No. NISN</label>
@@ -72,14 +79,7 @@
                                         Masuk ke Ujian
                                     </button>
                                 </div>
-                            </form>
-                            @if ($errors->any())
-                                <div class="alert alert-danger mt-4">
-                                    @foreach ($errors->all() as $error)
-                                        {{ $error }}
-                                    @endforeach
-                                </div>
-                            @endif
+                            </form>                            
                         </div>
                     </div>
 

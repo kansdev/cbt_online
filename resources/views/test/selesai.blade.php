@@ -46,7 +46,7 @@
 
                     <div class="d-grid gap-2 d-md-block">
                         <button type="button" class="btn btn-danger btn-md shadow-sm" onclick="reset()">Ulangi Test</button>
-                        <a href="{{ route('ujian.index') }}" class="btn btn-primary btn-md shadow-sm px-4">Kembali</a>
+                        <a href="{{ route('ujian.index') }}" class="btn btn-primary btn-md shadow-sm px-4">Selesai</a>
                     </div>
                 </div>
             </div>
@@ -65,7 +65,6 @@
             .then(res => {
                 if (res.status) {
                     alert(res.message);
-
                     // 🔥 redirect ke halaman cek peserta
                     window.location.href = "/ujian";
                 }

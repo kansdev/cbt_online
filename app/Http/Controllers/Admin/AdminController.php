@@ -9,9 +9,10 @@ use App\Models\Account;
 use App\Models\Soal;
 use App\Models\SoalAcak;
 use App\Models\Jawaban;
+use App\Models\Ujian;
+use App\Models\LogsActivityUser;
 
 use App\Imports\SoalImport;
-use App\Models\Ujian;
 use Maatwebsite\Excel\Facades\Excel;
 
 class AdminController extends Controller
@@ -19,7 +20,11 @@ class AdminController extends Controller
     public function index()
     {
         $peserta = Account::count();
-        return view('admin.pages.beranda', compact('peserta'));
+        $laki_laki = Account::where('jenis_kelamin', 'Laki-Laki')->count();
+        $perempuan = Account::where('jenis_kelamin', 'Perempuan')->count();
+
+        $log = LogsActivityUser::orderBy('created_at', 'desc')->get();
+        return view('admin.pages.beranda', compact('peserta', 'laki_laki', 'perempuan', 'log'));
     }
 
     public function peserta()
@@ -32,6 +37,16 @@ class AdminController extends Controller
     {
         $soal = Soal::all();
         return view('admin.pages.soal', compact('soal'));
+    }
+
+    public function peserta_aktif() {
+        $peserta_aktif = Account::all();
+        return view('admin.pages.aktif_peserta', compact('peserta_aktif'));
+    }
+
+    public function reset_peserta() {
+        $peserta = Ujian::with('account')->get();
+        return view('admin.pages.reset', compact('peserta'));
     }
 
     // Koreksi jawaban peserta
@@ -99,8 +114,8 @@ class AdminController extends Controller
                 ];
             });
         return view('admin.pages.koreksi', compact('detail_jawaban', 'jawaban', 'details'));
-    }
-
+    }    
+    
     // Fungsi untuk menampilkan riwayat ujian peserta
     public function riwayat()
     {
@@ -108,9 +123,43 @@ class AdminController extends Controller
         return view('admin.pages.riwayat', compact('riwayat'));
     }
 
-    public function peserta_aktif() {
-        $peserta_aktif = Account::all();
-        return view('admin.pages.aktif_peserta', compact('peserta_aktif'));
+
+    public function aktifkan_seluruh_peserta() { 
+        try {
+            Account::where('status', '!=', 'aktif')->update([
+                'status' => 'aktif'
+            ]);
+            return back()->with('success', 'Semua peserta sudah aktif');
+        } catch (\Exception $e) {
+            return back()->with('failed', 'Gagal mengaktifkan peserta. ' . $e->getMessage());
+        }
+    }
+
+    public function nonaktifkan_seluruh_peserta() {
+        try {
+            Account::where('status', '!=', 'nonaktif')->update([
+                'status' => 'nonaktif'
+            ]);
+            return back()->with('success', 'Semua peserta sudah di nonaktifkan');
+        } catch (\Exception $e) {
+            return back()->with('failed', 'Gagal menonaktifkan peserta. ' . $e->getMessage());
+        }
+    }
+
+    public function nonaktifkan_peserta($id) {
+        try {
+            $peserta = Account::findOrFail($id);
+
+            if ($peserta->status === 'nonaktif') return;
+
+            $peserta->update([
+                'status' => 'nonaktif'
+            ]);
+
+            return redirect()->route('admin.aktif_peserta');
+        } catch (\Exception $e) {
+            return back()->with('failed', 'Gagal menonaktifkan peserta. ' . $e->getMessage());
+        }
     }
 
     // Fungsi untuk upload soal dari file Excel
@@ -125,6 +174,22 @@ class AdminController extends Controller
         Excel::import($import, $file);
 
         return redirect()->back()->with('success', 'Soal berhasil diimpor!');
+    }
+
+    public function reset($id_siswa)
+    {
+        try {
+            // Hapus semua data ujian, soal acak, dan jawaban untuk siswa tersebut
+            // echo "Reset";
+            Ujian::where('id_siswa', $id_siswa)->delete();
+            SoalAcak::with('soal')->where('id_siswa', $id_siswa)->delete();
+            Jawaban::where('id_siswa', $id_siswa)->delete();
+
+            return back()->with('success', 'Berhasil reset ujian');
+        } catch (\Throwable $th) {
+            return back()->with('failed', 'Gagal reset ujian : '. $e->getMessage());
+        }
+        
     }
 
 }

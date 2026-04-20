@@ -3,7 +3,7 @@
 @section('content')
     <h2 class="mb-4">Peserta</h2>
 
-    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#tambahPeserta">Tambah Peserta</button>
+    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#tambahPeserta">Reset Peserta</button>
 
     <div class="card border-0 shadow-sm">
         <div class="card-header bg-white py-3">
@@ -15,24 +15,26 @@
                     <thead class="table-light">
                         <tr>
                             <th>No</th>
-                            <th>Kategori</th>
-                            <th>Soal</th>
+                            <th>NISN</th>
+                            <th>Nama</th>
                             <th>Jurusan</th>
                             <th>Status</th>
-                        </tr>     
+                            <th>Aksi</th>
+                        </tr>
                     </thead>
                     <tbody>
                         @foreach ($peserta as $p)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $p->nisn }}</td>
-                                <td>{{ $p->name }}</td>
-                                <td>{{ $p->jurusan }}</td>
+                                <td>{{ $p->account->name }}</td>
+                                <td>{{ $p->account->jurusan }}</td>
+                                <td>{{ ucfirst($p->status) }}</td>
                                 <td>
-                                    @if ($p->status == 'nonaktif')
-                                        <a href="#" class="badge bg-danger">Non Active</a>
-                                    @elseif ($p->status == 'aktif') 
-                                        <a href="{{ route('admin.aktif_peserta.one_nonaktif', $p->id)}}" class="badge bg-success">Active</a>                                 
+                                    @if ($p->status == 'selesai')
+                                        <a href="{{ route('admin.reset', $p->id) }}" class="badge bg-danger">Reset</a>
+                                    @elseif ($p->status == 'mulai')
+                                        <a href="{{ route('admin.reset', $p->id) }}" class="badge bg-secondary">Reset</a>
                                     @endif
                                 </td>
                             </tr>

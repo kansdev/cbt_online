@@ -21,7 +21,7 @@
                 <div class="d-flex justify-content-between">
                     <div>
                         <p class="text-muted mb-1">Peserta Laki-Laki</p>
-                        <h4>1,234</h4>
+                        <h4>{{ $laki_laki }}</h4>
                     </div>
                     <div class="text-primary fs-3"><i class="bi bi-people"></i></div>
                 </div>
@@ -33,7 +33,7 @@
                 <div class="d-flex justify-content-between">
                     <div>
                         <p class="text-muted mb-1">Peserta Perempuan</p>
-                        <h4>1,234</h4>
+                        <h4>{{ $perempuan }}</h4>
                     </div>
                     <div class="text-primary fs-3"><i class="bi bi-people"></i></div>
                 </div>
@@ -51,18 +51,22 @@
                     <thead class="table-light">
                         <tr>
                             <th>No</th>
-                            <th>Waktu</th>
                             <th>Aktivitas</th>
                             <th>IP Address</th>
+                            <th>Browser</th>
+                            <th>Waktu</th>
                         </tr>      
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>2024-06-01 10:15:30</td>
-                            <td>Peserta A melakukan login</td>
-                            <td>192.168.1.100</td>
-                        </tr>
+                        @foreach ($log as $l)
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $l->activity }}</td>
+                                <td>{{ $l->ip_address }}</td>
+                                <td>{{ $l->user_agent }}</td>
+                                <td>{{ $l->created_at }}</td>
+                            </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>

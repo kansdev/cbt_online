@@ -1,16 +1,27 @@
 @extends('test.main')
 
 @section('content')
-<!-- Judul & Timer -->
+    <!-- Judul & Timer -->
     <div class="d-flex justify-content-between align-items-end mb-4">
         <div>
             <h3 class="fw-bold mb-0">Ujian Satuan Pendidikan</h3>
             <span class="badge bg-primary">Latihan Soal</span>
         </div>
+
+        
+
         <div class="text-end">
             <small class="text-muted d-block">Sisa Waktu</small>
             <h5 id="timer" class="text-danger fw-bold mb-0"></h5>
         </div>
+    </div>
+
+    {{-- Tampilan tombol untuk menampilkan jumlah soal dari nomor 1 sampai sekian berdasarkan tahap ujian  --}}
+
+    <div class="mb-3">
+        <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalNomor">
+            Lihat Nomor Soal
+        </button>
     </div>
     <!-- Kartu Soal -->
     <div class="card quiz-card p-4 p-md-5">
@@ -36,7 +47,9 @@
 
             @foreach (['A','B','C','D','E'] as $opt)
                 <div class="option-container">
-                    <input type="radio" class="btn-check" name="jawaban" id="opt{{ $loop->index + 1 }}" value="{{ $opt }}">
+                    <input type="radio" class="btn-check" name="jawaban" id="opt{{ $loop->index + 1 }}" value="{{ $opt }}" @if ($jawaban_saat_ini && $jawaban_saat_ini->jawaban == $opt)
+                checked
+            @endif>
                     <label class="option-label" for="opt{{ $loop->index + 1 }}">
                         <span class="option-badge">{{ $opt }}</span>
                         <span>{{ $jawaban[$opt] }}</span>
@@ -51,6 +64,34 @@
                 </button>
             </div>
         </form>
+    </div>
+
+    <div class="modal fade" id="modalNomor" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Daftar Soal</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="d-flex flex-wrap gap-2">
+
+                        @foreach ($semua_soal as $index => $s)
+                            @php
+                                $sudah = in_array($s->id_soal, $jawaban_user);
+                            @endphp
+
+                            <a href="{{ route('ujian.soal', $s->id_siswa) }}?no={{ $s->urutan }}"
+                            class="btn btn-sm {{ $sudah ? 'btn-success' : 'btn-secondary' }}">
+                                {{ $index + 1 }}
+                            </a>
+                        @endforeach
+
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -124,6 +165,11 @@
             } else {
                 clearInterval(x);
                 display.innerText = "Waktu Habis";
+
+                // 🔥 redirect ke backend biar trigger controller
+                setTimeout(() => {
+                    window.location.href = "/ujian/mulai/1";
+                }, 1000);
             }
         }, 1000);
     </script>

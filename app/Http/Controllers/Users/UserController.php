@@ -30,9 +30,9 @@ class UserController extends Controller
         $datetime = Carbon::now()->format('d F Y, H:i') . ' WIB';
 
         // Jika data siswa tidak ditemukan, kembalikan response error
-        if(!$siswa) {
-            return back()->withErrors(['nisn' => 'Peserta dengan NISN ' . $validate['nisn'] . ' tidak ditemukan'])->withInput();
-        }
+        if(!$siswa) return back()->withErrors(['nisn' => 'Peserta dengan NISN ' . $validate['nisn'] . ' tidak ditemukan'])->withInput();
+
+        if($siswa->status == 'nonaktif') return back()->withErrors(['staus' => 'Peserta belum aktif'])->withInput();
 
         // Jika data siswa ditemukan, kembalikan response sukses dengan data siswa
         return view('test.peserta', compact('siswa', 'datetime'));
@@ -120,10 +120,21 @@ class UserController extends Controller
                 'tahap' => 'umum',
                 'mulai_at' => now()
             ]
-        );
+        );        
 
         // Cek jika ujian sudah selesai, langsung tampilkan halaman selesai
         if($ujian->status == 'selesai') {
+
+            $semua_soal = SoalAcak::where('id_siswa', $id_siswa)
+                ->where('tahap', $ujian->tahap)
+                ->orderBy('urutan')
+                ->get();
+
+            $jawaban_user = Jawaban::where('id_siswa', $id_siswa)
+                ->where('tahap', $ujian->tahap)
+                ->pluck('id_soal')
+                ->toArray();
+                
             // Hitung jumlah soal
             $soal = Soal::count();
 
@@ -144,12 +155,20 @@ class UserController extends Controller
 
             // Nilai skor (misal 100 jika semua benar, 0 jika semua salah)
             $skor = $total > 0 ? round(($benar / $total) * 100) : 0;
+
+            $jawaban_saat_ini = Jawaban::where('id_siswa', $id_siswa)
+            ->where('id_soal', $soal_acak->id_soal)
+            ->first();
+
             return view('test.selesai', [
                 'soal' => $soal,
                 'benar' => $benar,
                 'total' => $total,
                 'salah' => $salah,
-                'skor' => $skor
+                'skor' => $skor,
+                'semua_soal' => $semua_soal,
+                'jawaban_user' => $jawaban_user,
+                'jawaban_saat_ini' => $jawaban_saat_ini
             ]);
         }
 
@@ -185,12 +204,30 @@ class UserController extends Controller
 
             // Nilai skor (misal 100 jika semua benar, 0 jika semua salah)
             $skor = $total > 0 ? round(($benar / $total) * 100) : 0;
+
+            $semua_soal = SoalAcak::where('id_siswa', $id_siswa)
+                ->where('tahap', $ujian->tahap)
+                ->orderBy('urutan')
+                ->get();
+
+            $jawaban_user = Jawaban::where('id_siswa', $id_siswa)
+                ->where('tahap', $ujian->tahap)
+                ->pluck('id_soal')
+                ->toArray();
+                
+            $jawaban_saat_ini = Jawaban::where('id_siswa', $id_siswa)
+                ->where('id_soal', $soal_acak->id_soal)
+                ->first();
+
             return view('test.selesai', [
                 'soal' => $soal,
                 'benar' => $benar,
                 'total' => $total,
                 'salah' => $salah,
-                'skor' => $skor
+                'skor' => $skor,
+                'semua_soal' => $semua_soal,
+                'jawaban_user' => $jawaban_user,
+                'jawaban_saat_ini' => $jawaban_saat_ini
             ]);
         }
 
@@ -247,12 +284,30 @@ class UserController extends Controller
                     // Nilai skor (misal 100 jika semua benar, 0 jika semua salah)
                     $skor = $total > 0 ? round(($benar / $total) * 100) : 0;
 
+                    $semua_soal = SoalAcak::where('id_siswa', $id_siswa)
+                        ->where('tahap', $ujian->tahap)
+                        ->orderBy('urutan')
+                        ->get();
+
+                    $jawaban_user = Jawaban::where('id_siswa', $id_siswa)
+                        ->where('tahap', $ujian->tahap)
+                        ->pluck('id_soal')
+                        ->toArray();
+
+                        
+                    $jawaban_saat_ini = Jawaban::where('id_siswa', $id_siswa)
+                        ->where('id_soal', $soal_acak->id_soal)
+                        ->first();
+
                     return view('test.selesai', [
                         'soal' => $soal,
                         'benar' => $benar,
                         'total' => $total,
                         'salah' => $salah,
-                        'skor' => $skor
+                        'skor' => $skor,
+                        'semua_soal' => $semua_soal,
+                        'jawaban_user' => $jawaban_user,
+                        'jawaban_saat_ini' => $jawaban_saat_ini
                     ]);
                 }
 
@@ -275,16 +330,44 @@ class UserController extends Controller
             return redirect()->route('ujian.soal', $id_siswa);
         }
 
+        $no = request('no');
+
+        if ($no) {
+            $soal_acak = SoalAcak::with('soal')
+                ->where('id_siswa', $id_siswa)
+                ->where('tahap', $ujian->tahap)
+                ->orderBy('urutan')
+                ->skip($no - 1)
+                ->first();
+
+            $nomor = $no;
+        } else {
+            // default: lanjut soal berikutnya
+            $jumlah_jawab = Jawaban::where('id_siswa', $id_siswa)
+                ->where('tahap', $ujian->tahap)
+                ->count();
+
+            $soal_acak = SoalAcak::with('soal')
+                ->where('id_siswa', $id_siswa)
+                ->where('tahap', $ujian->tahap)
+                ->orderBy('urutan')
+                ->skip($jumlah_jawab)
+                ->first();
+
+            $nomor = $jumlah_jawab + 1;
+        }
+
         // Soal berikutnya berdasarkan jumlah jawaban yang sudah dijawab
-        $jumlah_jawab = Jawaban::where('id_siswa', $id_siswa)
-            ->where('tahap', $ujian->tahap)
-            ->count();
-        $soal_acak = SoalAcak::with('soal')
-            ->where('id_siswa', $id_siswa)
-            ->where('tahap', $ujian->tahap)
-            ->orderBy('urutan')
-            ->skip($jumlah_jawab)
-            ->first();
+        // $jumlah_jawab = Jawaban::where('id_siswa', $id_siswa)
+        //     ->where('tahap', $ujian->tahap)
+        //     ->count();
+
+        // $soal_acak = SoalAcak::with('soal')
+        //     ->where('id_siswa', $id_siswa)
+        //     ->where('tahap', $ujian->tahap)
+        //     ->orderBy('urutan')
+        //     ->skip($jumlah_jawab)
+        //     ->first();
 
         // Jika soal habis, cek tahap dan update status
         if(!$soal_acak) {
@@ -321,23 +404,59 @@ class UserController extends Controller
                 // Nilai skor (misal 100 jika semua benar, 0 jika semua salah)
                 $skor = $total > 0 ? round(($benar / $total) * 100) : 0;
 
+                $semua_soal = SoalAcak::where('id_siswa', $id_siswa)
+                    ->where('tahap', $ujian->tahap)
+                    ->orderBy('urutan')
+                    ->get();
+
+                $jawaban_user = Jawaban::where('id_siswa', $id_siswa)
+                    ->where('tahap', $ujian->tahap)
+                    ->pluck('id_soal')
+                    ->toArray();
+
+                        
+                $jawaban_saat_ini = Jawaban::where('id_siswa', $id_siswa)
+                    ->where('id_soal', $soal_acak->id_soal)
+                    ->first();
+
                 return view('test.selesai', [
                     'soal' => $soal,
                     'benar' => $benar,
                     'total' => $total,
                     'salah' => $salah,
-                    'skor' => $skor
+                    'skor' => $skor,
+                    'semua_soal' => $semua_soal,
+                    'jawaban_user' => $jawaban_user,
+                    'jawaban_saat_ini' => $jawaban_saat_ini
                 ]);
             }
         }
 
+        $semua_soal = SoalAcak::where('id_siswa', $id_siswa)
+            ->where('tahap', $ujian->tahap)
+            ->orderBy('urutan')
+            ->get();
+
+        $jawaban_user = Jawaban::where('id_siswa', $id_siswa)
+            ->where('tahap', $ujian->tahap)
+            ->pluck('id_soal')
+            ->toArray();
+
+            
+        $jawaban_saat_ini = Jawaban::where('id_siswa', $id_siswa)
+            ->where('id_soal', $soal_acak->id_soal)
+            ->first();
+
         return view('test.soal', [
             'siswa' => $siswa,
             'soal' => $soal_acak,
-            'nomor' => $jumlah_jawab + 1,
+            'nomor' => $nomor,
             'urutan' => $soal_acak->urutan,
             'tahap' => $ujian->tahap,
-            'sisa_waktu' => $hasil_akhir
+            'sisa_waktu' => $hasil_akhir,
+            'semua_soal' => $semua_soal,
+            'jawaban_user' => $jawaban_user,
+            'jawaban_saat_ini' => $jawaban_saat_ini
         ]);
     }
 
