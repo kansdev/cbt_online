@@ -18,11 +18,11 @@
 
     {{-- Tampilan tombol untuk menampilkan jumlah soal dari nomor 1 sampai sekian berdasarkan tahap ujian  --}}
 
-    <div class="mb-3">
+    {{-- <div class="mb-3">
         <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalNomor">
             Lihat Nomor Soal
         </button>
-    </div>
+    </div> --}}
     <!-- Kartu Soal -->
     <div class="card quiz-card p-4 p-md-5">
         <div class="mb-4">
