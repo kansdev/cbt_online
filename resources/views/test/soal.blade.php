@@ -8,7 +8,7 @@
             <span class="badge bg-primary">Latihan Soal</span>
         </div>
 
-        
+
 
         <div class="text-end">
             <small class="text-muted d-block">Sisa Waktu</small>
@@ -26,7 +26,7 @@
     <!-- Kartu Soal -->
     <div class="card quiz-card p-4 p-md-5">
         <div class="mb-4">
-            <span class="text-muted fw-bold">Pertanyaan Ke {{ $nomor }}</span>
+            {{-- <span class="text-muted fw-bold">Pertanyaan Ke {{ $nomor }}</span> --}}
             <h4 class="mt-2 lh-base">{{ $soal->soal->pertanyaan }}</h4>
         </div>
 
@@ -47,9 +47,7 @@
 
             @foreach (['A','B','C','D','E'] as $opt)
                 <div class="option-container">
-                    <input type="radio" class="btn-check" name="jawaban" id="opt{{ $loop->index + 1 }}" value="{{ $opt }}" @if ($jawaban_saat_ini && $jawaban_saat_ini->jawaban == $opt)
-                checked
-            @endif>
+                    <input type="radio" class="btn-check" name="jawaban" id="opt{{ $loop->index + 1 }}" value="{{ $opt }}">
                     <label class="option-label" for="opt{{ $loop->index + 1 }}">
                         <span class="option-badge">{{ $opt }}</span>
                         <span>{{ $jawaban[$opt] }}</span>
@@ -64,34 +62,6 @@
                 </button>
             </div>
         </form>
-    </div>
-
-    <div class="modal fade" id="modalNomor" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Daftar Soal</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-
-                <div class="modal-body">
-                    <div class="d-flex flex-wrap gap-2">
-
-                        @foreach ($semua_soal as $index => $s)
-                            @php
-                                $sudah = in_array($s->id_soal, $jawaban_user);
-                            @endphp
-
-                            <a href="{{ route('ujian.soal', $s->id_siswa) }}?no={{ $s->urutan }}"
-                            class="btn btn-sm {{ $sudah ? 'btn-success' : 'btn-secondary' }}">
-                                {{ $index + 1 }}
-                            </a>
-                        @endforeach
-
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <script>

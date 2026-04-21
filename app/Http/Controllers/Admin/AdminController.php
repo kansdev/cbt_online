@@ -114,8 +114,8 @@ class AdminController extends Controller
                 ];
             });
         return view('admin.pages.koreksi', compact('detail_jawaban', 'jawaban', 'details'));
-    }    
-    
+    }
+
     // Fungsi untuk menampilkan riwayat ujian peserta
     public function riwayat()
     {
@@ -124,7 +124,7 @@ class AdminController extends Controller
     }
 
 
-    public function aktifkan_seluruh_peserta() { 
+    public function aktifkan_seluruh_peserta() {
         try {
             Account::where('status', '!=', 'aktif')->update([
                 'status' => 'aktif'
@@ -178,7 +178,7 @@ class AdminController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()->with('failed', 'Soal gagal diimpor! : ' . $e->getMessage());
         }
-        
+
     }
 
     public function reset($id_siswa)
@@ -191,10 +191,10 @@ class AdminController extends Controller
             Jawaban::where('id_siswa', $id_siswa)->delete();
 
             return back()->with('success', 'Berhasil reset ujian');
-        } catch (\Throwable $th) {
+        } catch (\Throwable $e) {
             return back()->with('failed', 'Gagal reset ujian : '. $e->getMessage());
         }
-        
+
     }
 
 }

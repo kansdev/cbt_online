@@ -120,7 +120,7 @@ class UserController extends Controller
                 'tahap' => 'umum',
                 'mulai_at' => now()
             ]
-        );        
+        );
 
         // Cek jika ujian sudah selesai, langsung tampilkan halaman selesai
         if($ujian->status == 'selesai') {
@@ -138,7 +138,7 @@ class UserController extends Controller
                 ->where('tahap', $ujian->tahap)
                 ->pluck('id_soal')
                 ->toArray();
-                
+
             // Hitung jumlah soal
             $soal = Soal::count();
 
@@ -303,7 +303,7 @@ class UserController extends Controller
             }
 
             return redirect()->route('ujian.soal', $id_siswa);
-        }        
+        }
 
         // Soal berikutnya berdasarkan jumlah jawaban yang sudah dijawab
         $jumlah_jawab = Jawaban::where('id_siswa', $id_siswa)
@@ -376,7 +376,6 @@ class UserController extends Controller
         return view('test.soal', [
             'siswa' => $siswa,
             'soal' => $soal_acak,
-            'nomor' => $nomor,
             'urutan' => $soal_acak->urutan,
             'tahap' => $ujian->tahap,
             'sisa_waktu' => $hasil_akhir,
