@@ -162,6 +162,22 @@ class AdminController extends Controller
         }
     }
 
+    public function aktifkan_peserta($id) {
+        try {
+            $peserta = Account::findOrFail($id);
+
+            if ($peserta->status === 'aktif') return;
+
+            $peserta->update([
+                'status' => 'aktif'
+            ]);
+
+            return redirect()->route('admin.aktif_peserta');
+        } catch (\Exception $e) {
+            return back()->with('failed', 'Gagal aktifkan peserta. ' . $e->getMessage());
+        }
+    }
+
     // Fungsi untuk upload soal dari file Excel
     function importSoal(Request $request)
     {

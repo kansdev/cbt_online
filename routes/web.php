@@ -16,6 +16,7 @@ Route::prefix('apps_ade')->group(function() {
     Route::put('/aktif-peserta/aktifkan', [AdminController::class, 'aktifkan_seluruh_peserta'])->name('admin.aktif_peserta.aktif');
     Route::put('/aktif-peserta/nonaktifkan', [AdminController::class, 'nonaktifkan_seluruh_peserta'])->name('admin.aktif_peserta.nonaktif');
     Route::get('/aktif-peserta/nonaktifkan-peserta/{id}', [AdminController::class, 'nonaktifkan_peserta'])->name('admin.aktif_peserta.one_nonaktif');
+    Route::get('/aktif-peserta/aktifkan-peserta/{id}', [AdminController::class, 'aktifkan_peserta'])->name('admin.aktif_peserta.one_aktif');
     Route::get('/reset/{id}', [AdminController::class, 'reset'])->name('admin.reset');
 });
 

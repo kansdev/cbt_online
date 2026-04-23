@@ -138,7 +138,7 @@
 
                 // 🔥 redirect ke backend biar trigger controller
                 setTimeout(() => {
-                    window.location.href = "/ujian/mulai/1";
+                    window.location.href = "/ujian/soal/{{ $siswa->id }}";
                 }, 1000);
             }
         }, 1000);

@@ -30,7 +30,7 @@
                                 <td>{{ $p->jurusan }}</td>
                                 <td>
                                     @if ($p->status == 'nonaktif')
-                                        <a href="#" class="badge bg-danger">Non Active</a>
+                                        <a href="{{ route('admin.aktif_peserta.one_aktif', $p->id)}}" class="badge bg-danger">Non Active</a>
                                     @elseif ($p->status == 'aktif') 
                                         <a href="{{ route('admin.aktif_peserta.one_nonaktif', $p->id)}}" class="badge bg-success">Active</a>                                 
                                     @endif
