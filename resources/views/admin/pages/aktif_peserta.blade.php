@@ -40,10 +40,10 @@
                                 <td>{{ $p->name }}</td>
                                 <td>{{ $p->jurusan }}</td>
                                 <td>
-                                    @if ($p->status === 'nonaktif')
-                                        <a href="#" data-bs-toggle="modal" data-bs-target="#aktif_{{ $p->nisn }}" class="badge bg-danger">Non-Aktif</a>
-                                    @elseif($p->status === 'aktif')
-                                        <a href="{{ route('admin.aktif_peserta.one_nonaktif', $p->id)}}" class="badge bg-success">Aktif</a>
+                                    @if ($p->status == 'nonaktif')
+                                        <a href="{{ route('admin.aktif_peserta.one_aktif', $p->id)}}" class="badge bg-danger">Non Active</a>
+                                    @elseif ($p->status == 'aktif') 
+                                        <a href="{{ route('admin.aktif_peserta.one_nonaktif', $p->id)}}" class="badge bg-success">Active</a>                                 
                                     @endif
                                 </td>
                             </tr>

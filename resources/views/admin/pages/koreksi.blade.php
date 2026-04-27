@@ -5,7 +5,13 @@
 
     <div class="card border-0 shadow-sm">
         <div class="card-header bg-white py-3">
-            <h4 class="m-0 fw-bold text-primary">Data Koreksi</h4>
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
+                <h4 class="m-0 fw-bold text-primary">Data Koreksi</h4>
+
+                <a href="{{ route('admin.unduh_hasil_jawaban') }}" class="btn btn-success btn-sm d-flex align-items-center">
+                    <span class="d-sm-inline">Unduh Hasil</span>
+                </a>
+            </div>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -23,7 +29,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <@php
+                        @php
                             $no = 1;
                         @endphp
                         @foreach ($detail_jawaban as $index => $d)

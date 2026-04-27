@@ -18,6 +18,11 @@ Route::prefix('apps_ade')->group(function() {
     Route::get('/aktif-peserta/nonaktifkan-peserta/{id}', [AdminController::class, 'nonaktifkan_peserta'])->name('admin.aktif_peserta.one_nonaktif');
     Route::get('/aktif-peserta/aktifkan-peserta/{id}', [AdminController::class, 'aktifkan_peserta'])->name('admin.aktif_peserta.one_aktif');
     Route::get('/reset/{id}', [AdminController::class, 'reset'])->name('admin.reset');
+    Route::delete('/clear_log', [AdminController::class, 'clear_log'])->name('admin.clear_log');
+    Route::get('/export-excel', [AdminController::class, 'unduh_hasil_jawaban'])->name('admin.unduh_hasil_jawaban');
+    Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
+    Route::post('/setting/durasi', [AdminController::class, 'settings_waktu_tes'])->name('admin.setting_durasi');
+    Route::post('/setting/gelombang', [AdminController::class, 'settings_gelombang'])->name('admin.setting_gelombang');
 });
 
 Route::prefix('ujian')->group(function() {

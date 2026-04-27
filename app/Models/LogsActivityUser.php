@@ -12,4 +12,9 @@ class LogsActivityUser extends Model
         'ip_address',
         'user_agent',
     ];
+
+    public function account()
+    {
+        return $this->belongsTo(Account::class, 'id_siswa', 'id');
+    }
 }

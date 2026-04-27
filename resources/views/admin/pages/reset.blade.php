@@ -3,6 +3,10 @@
 @section('content')
     <h2 class="mb-4">Peserta</h2>
 
+    @if (session('failed'))
+        <div class="alert alert-danger">{{ session('failed') }}</div>
+    @endif
+
     <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#tambahPeserta">Reset Peserta</button>
 
     <div class="card border-0 shadow-sm">
@@ -32,9 +36,9 @@
                                 <td>{{ ucfirst($p->status) }}</td>
                                 <td>
                                     @if ($p->status == 'selesai')
-                                        <a href="{{ route('admin.reset', $p->id) }}" class="badge bg-danger">Reset</a>
+                                        <a href="{{ route('admin.reset', $p->id_siswa) }}" class="badge bg-danger">Reset</a>
                                     @elseif ($p->status == 'mulai')
-                                        <a href="{{ route('admin.reset', $p->id) }}" class="badge bg-secondary">Reset</a>
+                                        <a href="{{ route('admin.reset', $p->id_siswa) }}" class="badge bg-secondary">Reset</a>
                                     @endif
                                 </td>
                             </tr>

@@ -13,6 +13,10 @@ class Account extends Model
         'status'
     ];
 
+    public function log_activity_users() {
+        return $this->has_one(LogsActivityUser::class, 'id_siswa', 'id');
+    }
+
     public function ujian()
     {
         return $this->hasOne(Ujian::class, 'id_siswa', 'id');

@@ -11,8 +11,11 @@ use App\Models\SoalAcak;
 use App\Models\Jawaban;
 use App\Models\Ujian;
 use App\Models\LogsActivityUser;
+use App\Models\SettingWaktuTes;
+use App\Models\SettingGelombang;
 
 use App\Imports\SoalImport;
+use App\Exports\KoreksiExport;
 use Maatwebsite\Excel\Facades\Excel;
 
 class AdminController extends Controller
@@ -23,8 +26,25 @@ class AdminController extends Controller
         $laki_laki = Account::where('jenis_kelamin', 'Laki-Laki')->count();
         $perempuan = Account::where('jenis_kelamin', 'Perempuan')->count();
 
-        $log = LogsActivityUser::orderBy('created_at', 'desc')->get();
+        $log = LogsActivityUser::with('account')->orderBy('created_at', 'desc')->get();
         return view('admin.pages.beranda', compact('peserta', 'laki_laki', 'perempuan', 'log'));
+    }
+
+    // Clear Log
+    public function clear_log() 
+    {
+        try {
+            $logs = LogsActivityUser::query()->delete();
+
+            // Cek jika log kosong tampilkan warning
+            if (empty($logs)) {
+                return redirect()->back()->with('warning', 'Logs is empty !!!');
+            }
+
+            return redirect()->back()->with('success', 'Clear Log Successfully !!!');
+        } catch(\Exception $e) {
+            return redirect()->back()->with('failed', 'Clear Log Failed !!!');
+        }        
     }
 
     public function peserta()
@@ -39,7 +59,8 @@ class AdminController extends Controller
         return view('admin.pages.soal', compact('soal'));
     }
 
-    public function peserta_aktif() {
+    public function peserta_aktif() 
+    {
         $peserta_aktif = Account::all();
         return view('admin.pages.aktif_peserta', compact('peserta_aktif'));
     }
@@ -123,8 +144,8 @@ class AdminController extends Controller
         return view('admin.pages.riwayat', compact('riwayat'));
     }
 
-
-    public function aktifkan_seluruh_peserta() {
+    public function aktifkan_seluruh_peserta() 
+    {
         try {
             Account::where('status', '!=', 'aktif')->update([
                 'status' => 'aktif'
@@ -135,7 +156,8 @@ class AdminController extends Controller
         }
     }
 
-    public function nonaktifkan_seluruh_peserta() {
+    public function nonaktifkan_seluruh_peserta() 
+    {
         try {
             Account::where('status', '!=', 'nonaktif')->update([
                 'status' => 'nonaktif'
@@ -146,7 +168,8 @@ class AdminController extends Controller
         }
     }
 
-    public function nonaktifkan_peserta($id) {
+    public function nonaktifkan_peserta($id) 
+    {
         try {
             $peserta = Account::findOrFail($id);
 
@@ -162,7 +185,8 @@ class AdminController extends Controller
         }
     }
 
-    public function aktifkan_peserta($id) {
+    public function aktifkan_peserta($id) 
+    {
         try {
             $peserta = Account::findOrFail($id);
 
@@ -201,16 +225,80 @@ class AdminController extends Controller
     {
         try {
             // Hapus semua data ujian, soal acak, dan jawaban untuk siswa tersebut
-            // echo "Reset";
-            Ujian::where('id_siswa', $id_siswa)->delete();
-            SoalAcak::with('soal')->where('id_siswa', $id_siswa)->delete();
             Jawaban::where('id_siswa', $id_siswa)->delete();
+            SoalAcak::with('soal')->where('id_siswa', $id_siswa)->delete();
+            Ujian::where('id_siswa', $id_siswa)->delete();
 
-            return back()->with('success', 'Berhasil reset ujian');
-        } catch (\Throwable $e) {
-            return back()->with('failed', 'Gagal reset ujian : '. $e->getMessage());
+            // dd([$jawaban, $soal, $ujian]);
+            return redirect()->back()->with('success', 'Berhasil reset ujian');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('failed', 'Gagal reset ujian : '. $e->getMessage());
         }
 
+    }
+
+    // Unduh hasil jawaban
+    public function unduh_hasil_jawaban() 
+    {
+        return Excel::download(new KoreksiExport, 'hasil_test.xlsx');
+    }
+
+    // Settings
+    public function settings() {
+        $setting_gelombang = SettingGelombang::all();
+        return view('admin.pages.settings', compact('setting_gelombang'));
+    }
+
+    public function settings_waktu_tes(Request $request) {
+        try {
+            $validate = $request->validate([
+                'gelombang' => 'required',
+                'durasi' => 'required|integer',
+                'tanggal_mulai' => 'required|date:m/d/y'
+            ]);
+
+            $isExist = SettingWaktuTes::where('id_gelombang', $validate['gelombang'])->exists();
+
+            if ($isExist) {
+                return redirect()->back()->with('failed', 'Sesi waktu untuk gelombang ini sudah di setting !!!');
+            }
+
+            SettingWaktuTes::create([
+                'id_gelombang' => $validate['gelombang'],
+                'durasi' => $validate['durasi'],
+                'tanggal_mulai' => $validate['tanggal_mulai'],
+            ]);
+
+            return redirect()->back()->with('success', 'Data durasi berhasil disimpan');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('failed', 'Data durasi gagal disimpan, keterangan : ' . $e->getMessage());
+        }
+    }
+
+    public function settings_gelombang(Request $request) {
+        try {
+            $validate = $request->validate([
+                'gelombang' => 'required|array|min:4',
+                'gelombang.*' => 'required|integer',
+                'status' => 'nullable|array'
+            ]);
+
+            $gelombang = $request->input('gelombang');
+            $status = $request->input('status', []);
+
+            foreach ($gelombang as $index => $id_gelombang) {
+                $isActive = array_key_exists($index, $status) ? 1 : 0;
+
+                SettingGelombang::updateOrCreate(
+                    ['id_gelombang' => $id_gelombang],
+                    ['status' => $isActive]
+                );
+            }
+
+            return redirect()->back()->with('success', 'Gelombang berhasil di buat');
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     }
 
 }

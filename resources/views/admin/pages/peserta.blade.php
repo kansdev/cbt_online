@@ -15,8 +15,8 @@
                     <thead class="table-light">
                         <tr>
                             <th>No</th>
-                            <th>Kategori</th>
-                            <th>Soal</th>
+                            <th>NIS/NISN</th>
+                            <th>Nama</th>
                             <th>Jurusan</th>
                             <th>Status</th>
                         </tr>     
@@ -30,9 +30,9 @@
                                 <td>{{ $p->jurusan }}</td>
                                 <td>
                                     @if ($p->status == 'nonaktif')
-                                        <a href="{{ route('admin.aktif_peserta.one_aktif', $p->id)}}" class="badge bg-danger">Non Active</a>
+                                        <span class="badge bg-danger">Non Active</span>
                                     @elseif ($p->status == 'aktif') 
-                                        <a href="{{ route('admin.aktif_peserta.one_nonaktif', $p->id)}}" class="badge bg-success">Active</a>                                 
+                                        <span class="badge bg-success">Active</span>                                 
                                     @endif
                                 </td>
                             </tr>
