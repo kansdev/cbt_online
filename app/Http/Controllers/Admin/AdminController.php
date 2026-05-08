@@ -51,7 +51,7 @@ class AdminController extends Controller
 
     public function peserta()
     {
-        $peserta = Account::all();
+        $peserta = Account::orderBy('nama', 'asc')->get();
         return view('admin.pages.peserta', compact('peserta'));
         // dd($peserta);
     }
@@ -64,7 +64,7 @@ class AdminController extends Controller
 
     public function peserta_aktif()
     {
-        $peserta_aktif = Account::all();
+        $peserta_aktif = Account::orderBy('nama', 'asc')->get();
         return view('admin.pages.aktif_peserta', compact('peserta_aktif'));
         // dd($peserta_aktif);
     }
