@@ -4,8 +4,8 @@
     <!-- Judul & Timer -->
     <div class="d-flex justify-content-between align-items-end mb-4">
         <div>
-            <h3 class="fw-bold mb-0">Ujian Satuan Pendidikan</h3>
-            <span class="badge bg-primary">Latihan Soal</span>
+            <h3 class="fw-bold mb-0">Computer Based Test</h3>
+            <span class="badge bg-primary">SMK Nusantara 1 Kota Tangerang</span>
         </div>
 
 

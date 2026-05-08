@@ -5,6 +5,8 @@
 
     <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#tambahPeserta">Tambah Peserta</button>
 
+    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#uploadModal">Upload Peserta</button>
+
     <div class="card border-0 shadow-sm">
         <div class="card-header bg-white py-3">
             <h4 class="m-0 fw-bold text-primary">Data Peserta</h4>
@@ -15,9 +17,11 @@
                     <thead class="table-light">
                         <tr>
                             <th>No</th>
+                            <th>No Registrasi</th>
                             <th>NIS/NISN</th>
                             <th>Nama</th>
                             <th>Jurusan</th>
+                            <th>Kategori</th>
                             <th>Gelombang</th>
                             <th>Status</th>
                         </tr>
@@ -26,9 +30,11 @@
                         @foreach ($peserta as $p)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
+                                <td>{{ $p->nomor_registrasi }}</td>
                                 <td>{{ $p->nisn }}</td>
-                                <td>{{ $p->name }}</td>
+                                <td>{{ $p->nama }}</td>
                                 <td>{{ $p->jurusan }}</td>
+                                <td>{{ $p->kategori }}</td>
                                 <td>{{ $p->id_gelombang }}</td>
                                 <td>
                                     @if ($p->status == 'nonaktif')
@@ -69,6 +75,27 @@
                             <input type="text" class="form-control" id="jurusan" name="jurusan" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Tambah</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uploadModalLabel">Upload Peserta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ route('admin.import-peserta') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="file" class="form-label">Pilih File Excel</label>
+                            <input type="file" class="form-control" id="file" name="file" accept=".xlsx, .xls">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Upload</button>
                     </form>
                 </div>
             </div>

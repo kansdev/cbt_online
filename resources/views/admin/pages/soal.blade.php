@@ -21,6 +21,7 @@
                     <thead class="table-light">
                         <tr>
                             <th>No</th>
+                            <th>Jenis Soal</th>
                             <th>Kategori</th>
                             <th>Soal</th>
                             <th>Status</th>
@@ -30,6 +31,7 @@
                         @foreach ($soal as $s)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
+                                <td>{{ $s->jenis_soal}}</td>
                                 <td>{{ $s->kategori }}</td>
                                 <td>{{ $s->pertanyaan }}</td>
                                 <td><span class="badge bg-success">Active</span></td>

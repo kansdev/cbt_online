@@ -7,11 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 class Account extends Model
 {
     protected $fillable = [
-        'name',
+        'nomor_registrasi',
+        'nama',
         'nisn',
+        'jenis_kelamin',
         'jurusan',
-        'status',
-        'id_gelombang'
+        'kategori',
+        'jenis_umum',
+        'jenis_kejuruan',
+        'tanggal_kelahiran',
+        'id_gelombang',
+        'status'
     ];
 
     public function log_activity_users() {

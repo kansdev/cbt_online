@@ -13,6 +13,7 @@ Route::prefix('apps_ade')->group(function() {
     Route::get('/reset-peserta', [AdminController::class, 'reset_peserta'])->name('admin.reset_peserta');
     Route::get('/riwayat', [AdminController::class, 'riwayat'])->name('admin.riwayat');
     Route::post('/import-soal', [AdminController::class, 'importSoal'])->name('admin.import-soal');
+    Route::post('/import-peserta', [AdminController::class, 'importPeserta'])->name('admin.import-peserta');
     Route::put('/aktif-peserta/aktifkan', [AdminController::class, 'aktifkan_seluruh_peserta'])->name('admin.aktif_peserta.aktif');
     Route::put('/aktif-peserta/aktifkan-pergelombang', [AdminController::class, 'aktifkan_peserta_pergelombang'])->name('admin.aktif_peserta.pergelombang');
     Route::put('/aktif-peserta/nonaktifkan-pergelombang', [AdminController::class, 'nonaktifkan_peserta_pergelombang'])->name('admin.nonaktif_peserta.pergelombang');

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Soal extends Model
 {
     protected $fillable = [
+        'jenis_soal',
         'kategori',
         'pertanyaan',
         'jawaban_a',

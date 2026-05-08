@@ -15,6 +15,7 @@ class SoalImport implements ToModel, WithHeadingRow
     public function model(array $row )
     {
         return new Soal([
+            'jenis_soal' => $row['jenis_soal'],
             'kategori' => $row['kategori'],
             'pertanyaan' => $row['pertanyaan'],
             'jawaban_a' => $row['jawaban_a'],

@@ -16,16 +16,6 @@
                     <div class="bg-light p-4 rounded-4 mb-4">
                         <h6 class="text-uppercase fw-bold text-muted small mb-3">Skor Anda</h6>
                         <div class="display-3 fw-bold text-primary mb-0">{{ $skor }}<span class="fs-4 text-muted">/100</span></div>
-                        @if ($skor < 50)
-                            <p class="text-muted">Haduh yang bener aja dong. Coba dipikirkan secara logika !!!</p>
-                        @elseif ($skor < 75)
-                            <p class="text-muted">Lumayan, lebih keras lagi usahanya!</p>
-                        @elseif ($skor < 90)
-                            <p class="text-muted">Good! Saya suka saya suka !!!.</p>
-                        @else
-                            <p class="text-muted">Wow, luar biasa! Kamu benar-benar menguasai materi ini dengan sangat baik!</p>
-                        @endif
-                        
                     </div>
 
                     <!-- Statistik Singkat -->
@@ -39,7 +29,7 @@
                             <small class="text-muted">Salah</small>
                         </div>
                         <div class="col-4">
-                            <h5 class="mb-0 fw-bold text-info">{{ $total }} / {{ $soal }}</h5>
+                            <h5 class="mb-0 fw-bold text-info">{{ $total }} / 50</h5>
                             <small class="text-muted">Terjawab</small>
                         </div>
                     </div>

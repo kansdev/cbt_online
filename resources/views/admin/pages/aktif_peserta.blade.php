@@ -27,9 +27,11 @@
                     <thead class="table-light">
                         <tr>
                             <th>No</th>
+                            <th>No Registrasi</th>
                             <th>NISN</th>
                             <th>Nama</th>
                             <th>Jurusan</th>
+                            <th>Kategori</th>
                             <th>Gelombang</th>
                             <th>Status</th>
                         </tr>
@@ -38,9 +40,11 @@
                         @foreach ($peserta_aktif as $p)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
+                                <td>{{ $p->nomor_registrasi }}</td>
                                 <td>{{ $p->nisn }}</td>
-                                <td>{{ $p->name }}</td>
+                                <td>{{ $p->nama }}</td>
                                 <td>{{ $p->jurusan }}</td>
+                                <td>{{ $p->kategori }}</td>
                                 <td>{{ $p->id_gelombang }}</td>
                                 <td>
                                     @if ($p->status == 'nonaktif')

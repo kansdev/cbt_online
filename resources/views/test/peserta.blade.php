@@ -58,24 +58,24 @@
                                     <h5 class="fw-bold mb-3 border-bottom pb-2">Informasi Peserta</h5>
                                     <div class="mb-3">
                                         <label class="text-muted small d-block">Nama Lengkap</label>
-                                        <span class="fw-semibold fs-5">{{ $siswa->name }}</span>
+                                        <span class="fw-semibold fs-5">{{ $siswa->nama }}</span>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="text-muted small d-block">Nomor NISN</label>
-                                        <span class="fw-semibold fs-5">{{ $siswa->nisn }}</span>
+                                        <label class="text-muted small d-block">Nomor Registrasi | NISN</label>
+                                        <span class="fw-semibold fs-5">{{ $siswa->nomor_registrasi . ' | ' . $siswa->nisn }}</span>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="text-muted small d-block">Mata Pelajaran</label>
-                                        <span class="badge bg-primary fs-6">Program Keahlian RPL</span>
+                                        <label class="text-muted small d-block">Pilihan Jurusan</label>
+                                        <span class="badge bg-primary fs-6">{{ $siswa->jurusan }}</span>
                                     </div>
                                     <div class="mb-4">
-                                        <label class="text-muted small d-block">Tanggal Ujian</label>
+                                        <label class="text-muted small d-block">Tanggal Tes</label>
                                         <span class="fw-semibold fs-5">{{ $datetime }}</span>
                                     </div>
 
                                     <div class="info-box shadow-sm">
                                         <div class="d-flex align-items-center mb-2">
-                                            <strong class="me-auto text-primary">Detail Ujian:</strong>
+                                            <strong class="me-auto text-primary">Detail Tes:</strong>
                                         </div>
                                         <div class="row text-center">
                                             <div class="col-6">

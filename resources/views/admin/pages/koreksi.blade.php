@@ -36,7 +36,7 @@
                             <tr>
 
                                 <td>{{$no++}}</td>
-                                <td>{{$d['name']}}</td>
+                                <td>{{$d['nama']}}</td>
                                 <td>{{$d['jumlah_soal']}}</td>
                                 <td>{{$d['benar']}}</td>
                                 <td>{{$d['salah']}}</td>
@@ -60,7 +60,7 @@
             <div class="modal-dialog modal-dialog-scrollable modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="detailJawabanLabel{{ $d['id_siswa'] }}">Detail Jawaban - {{ $d['name'] }}</h5>
+                        <h5 class="modal-title" id="detailJawabanLabel{{ $d['id_siswa'] }}">Detail Jawaban - {{ $d['nama'] }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">

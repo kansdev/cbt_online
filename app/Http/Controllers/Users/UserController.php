@@ -27,9 +27,9 @@ class UserController extends Controller
         ]);
 
         // Siapkan data siswa berdasarkan nomor account
-        $siswa = Account::where('nisn', $validate['nisn'])->first();
-
-        // dd($siswa);
+        $siswa = Account::where('nisn', $validate['nisn'])
+                    ->orWhere('nomor_registrasi', $validate['nisn'])
+                    ->first();
 
         // Siapkan data gelombang
         $gelombang = $this->cek_gelombang($validate['nisn']);
@@ -50,9 +50,13 @@ class UserController extends Controller
         if($gelombang->tanggal_mulai != date('Y-m-d')) return back()->withErrors(['gelombang' => 'Akun anda pada gelombang tersebut belum saatnya atau sudah selesai'])->withInput();
 
         // Cek status
-        if($siswa->status == 'nonaktif') return back()->withErrors(['staus' => 'Peserta belum aktif'])->withInput();
+        if($siswa->status == 'nonaktif') return back()->withErrors(['status' => 'Peserta belum aktif'])->withInput();
+        
+        $soal_umum = Soal::where('jenis_soal', 'umum')->count();
+        $soal_umum_kejuruan = Soal::where('jenis_soal', $siswa->jenis_umum)->count();
+        $soal_kejuruan = Soal::where('jenis_soal', $siswa->jenis_kejuruan)->count();
 
-        $soal = Soal::count();
+        $soal = $soal_umum + $soal_kejuruan + $soal_umum_kejuruan;
 
         // Jika data siswa ditemukan, kembalikan response sukses dengan data siswa
         return view('test.peserta', compact('siswa', 'datetime', 'gelombang', 'soal'));
@@ -62,7 +66,6 @@ class UserController extends Controller
     {
         // cek kalau sudah pernah ujian dan statusnya selesai → langsung ke halaman selesai
         $cek_ujian = Ujian::where('id_siswa', $id_siswa)->first();
-
         if ($cek_ujian && $cek_ujian->status == 'selesai') {
             // Hitung jumlah soal
             $soal = Soal::count();
@@ -190,7 +193,6 @@ class UserController extends Controller
                 'semua_soal' => $semua_soal,
             ]);
         }
-
 
         // Jika waktu sudah habis maka update ke status ujian selesai
         $waktu_mulai = $ujian->mulai_at;
@@ -480,13 +482,23 @@ class UserController extends Controller
     {
         $jurusan = strtoupper($siswa->jurusan);
         if($tahap == 'umum') {
-            return ['umum'];
+            if($jurusan == 'RPL') return ['mtk_umum', 'bindo_teknik', 'binggris_teknik'];
+            if($jurusan == 'TJKT') return ['mtk_umum', 'bindo_teknik', 'binggris_teknik'];
+            if($jurusan == 'DKV') return ['mtk_umum', 'bindo_seni', 'binggris_seni'];
+            if($jurusan == 'BP') return ['mtk_umum', 'bindo_seni', 'binggris_seni'];
+            if($jurusan == 'AN') return ['mtk_umum', 'bindo_seni', 'binggris_seni'];
+            if($jurusan == 'MP') return ['mtk_umum', 'bindo_manajemen', 'binggris_manajemen'];
+            if($jurusan == 'AK') return ['mtk_umum', 'bindo_manajemen', 'binggris_manajemen'];
         }
 
         if($tahap == 'kejuruan') {
-            if ($jurusan == 'RPL') {
-                return ['rpl'];
-            }
+            if ($jurusan == 'RPL') return ['rpl_tkj'];
+            if ($jurusan == 'TJKT') return ['rpl_tkj'];
+            if ($jurusan == 'DKV') return ['an_dkv_bp'];
+            if ($jurusan == 'BP') return ['an_dkv_bp'];
+            if ($jurusan == 'AN') return ['an_dkv_bp'];
+            if ($jurusan == 'MP') return ['mp_ak'];
+            if ($jurusan == 'AK') return ['mp_ak'];
         }
 
         return [];
@@ -573,6 +585,7 @@ class UserController extends Controller
                 ->join('setting_gelombang', 'accounts.id_gelombang', '=', 'setting_gelombang.id_gelombang')
                 ->join('setting_duration', 'setting_gelombang.id_gelombang', '=', 'setting_duration.id_gelombang')
                 ->where('accounts.nisn', $nisn)
+                ->orWhere('accounts.nomor_registrasi', $nisn)
                 ->select('accounts.*', 'setting_gelombang.*', 'setting_duration.*')
                 ->first();
 
