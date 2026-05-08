@@ -11,10 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('setting_gelombang', function (Blueprint $table) {
+        Schema::create('setting_anti_tab_switch', function (Blueprint $table) {
             $table->id();
-            $table->integer('id_gelombang');
-            $table->boolean('status')->default('0');
+            $table->integer('status')->default('0');
             $table->timestamps();
         });
     }

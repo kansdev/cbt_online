@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('nisn')->unique();
             $table->enum('jenis_kelamin', ['Laki-laki', 'Perempuan']);
             $table->string('jurusan')->nullable();
+            $table->integer('id_gelombang')->nullable();
             $table->enum('status', ['aktif', 'nonaktif'])->default('nonaktif');
             $table->timestamps();
         });

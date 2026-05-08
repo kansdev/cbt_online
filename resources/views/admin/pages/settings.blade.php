@@ -2,7 +2,7 @@
 
 @section('content')
     <h2 class="mb-4">Settings</h2>
-    
+
     {{-- Message --}}
     @if (session('success'))
         <div class="alert alert-success"><i class="bi bi-check-circle-fill fs-5"></i> {{ session('success') }}</div>
@@ -98,7 +98,7 @@
                             </div>
                         </div>
                     </form>
-                    
+
                 </div>
 
                 <!-- Panel Waktu Tes -->
@@ -117,10 +117,10 @@
 
                         <div class="mb-2">
                             <label class="form-label fw-bold">Durasi Tes (Menit)</label>
-                            <input type="number" class="form-control" name="durasi" placeholder="Contoh: 90">        
+                            <input type="number" class="form-control" name="durasi" placeholder="Contoh: 90">
                         </div>
-                        
-                        <div class="mb-2">                            
+
+                        <div class="mb-2">
                             <label class="form-label fw-bold">Jadwal Mulai</label>
                             <input type="date" class="form-control" name="tanggal_mulai">
                         </div>
@@ -129,15 +129,30 @@
                             <button type="submit" class="btn btn-primary px-4">Simpan</button>
                         </div>
                     </form>
-                </div>                
+                </div>
 
                 <!-- Panel Gelombang -->
                 <div class="tab-pane fade" id="keamanan-pane" role="tabpanel" tabindex="0">
+                    <form id="formAntiInspect" action="{{ route('admin.setting_anti_inspect_element') }}" method="POST">
+                        @csrf
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label class="form-label fw-bold">Anti Inspect Element</label>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check form-switch mt-2">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="inspectElement" name="anti_inspect" onchange="document.getElementById('formAntiInspect').submit()" {{ isset($setting_anti_inspect) && optional($setting_anti_inspect)->status == 1 ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="inspectElement">Aktif</label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
                     <form action="#" method="POST">
                         @csrf
                         <div class="row g-3">
                             <div class="col-md-8">
-                                <label class="form-label fw-bold">Block Copy / Paste</label>                                
+                                <label class="form-label fw-bold">Block Copy / Paste</label>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-check form-switch mt-2">
@@ -152,7 +167,7 @@
                         @csrf
                         <div class="row g-3">
                             <div class="col-md-8">
-                                <label class="form-label fw-bold">Anti Tab Switch</label>                                
+                                <label class="form-label fw-bold">Anti Tab Switch</label>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-check form-switch mt-2">

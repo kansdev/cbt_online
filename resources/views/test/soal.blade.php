@@ -143,4 +143,17 @@
             }
         }, 1000);
     </script>
+
+    @if ($anti_inspect == 0)
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === "F12") e.preventDefault();
+                    if (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J")) e.preventDefault();
+                    if (e.ctrlKey && e.key === "U") e.preventDefault();
+                });
+                document.addEventListener('contextmenu', e => e.preventDefault());
+            });
+        </script>
+    @endif
 @endsection

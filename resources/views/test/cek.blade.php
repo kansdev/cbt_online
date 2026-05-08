@@ -55,7 +55,7 @@
                             <h4 class="fw-bold mb-0">CBT Online</h4>
                             <p class="small mb-0 opacity-75">Silakan masuk untuk memulai</p>
                         </div>
-                        
+
                         <div class="card-body p-4 p-md-5">
                             @if ($errors->any())
                                 <div class="alert alert-danger">
@@ -74,12 +74,22 @@
                                     </div>
                                 </div>
 
+                                <div class="mb-4">
+                                    <label for="gelombang" class="form-label fw-semibold text-muted">Pilih gelombang</label>
+                                    <select class="form-control" name="gelombang" id="gelombang">
+                                        <option value="1" selected>Gelombang 1</option>
+                                        <option value="2">Gelombang 2</option>
+                                        <option value="3">Gelombang 3</option>
+                                        <option value="4">Gelombang 4</option>
+                                    </select>
+                                </div>
+
                                 <div class="d-grid">
                                     <button type="submit" class="btn btn-primary btn-lg btn-login shadow-sm">
                                         Masuk ke Ujian
                                     </button>
                                 </div>
-                            </form>                            
+                            </form>
                         </div>
                     </div>
 

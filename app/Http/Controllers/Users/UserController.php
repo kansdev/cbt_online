@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Users;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 use App\Models\Account;
@@ -13,6 +14,7 @@ use App\Models\Jawaban;
 use App\Models\SoalAcak;
 
 use App\Models\LogsActivityUser;
+use App\Models\SettingAntiInspectElement;
 
 class UserController extends Controller
 {
@@ -20,11 +22,17 @@ class UserController extends Controller
     {
         // Cek validasi input
         $validate = $request->validate([
-            'nisn' => 'required|numeric'
+            'nisn' => 'required|numeric',
+            'gelombang' => 'required'
         ]);
 
         // Siapkan data siswa berdasarkan nomor account
         $siswa = Account::where('nisn', $validate['nisn'])->first();
+
+        // dd($siswa);
+
+        // Siapkan data gelombang
+        $gelombang = $this->cek_gelombang($validate['nisn']);
 
         // Format tanggal sekarang
         $datetime = Carbon::now()->format('d F Y, H:i') . ' WIB';
@@ -32,16 +40,29 @@ class UserController extends Controller
         // Jika data siswa tidak ditemukan, kembalikan response error
         if(!$siswa) return back()->withErrors(['nisn' => 'Peserta dengan NISN ' . $validate['nisn'] . ' tidak ditemukan'])->withInput();
 
+        // Cek gelombang
+        if($siswa->id_gelombang != $validate['gelombang']) return back()->withErrors(['nisn' => 'Akun anda belum masuk pada jadwal gelombang manapun'])->withInput();
+
+        // Cek apakah akun sudah di setting gelombang dan durasinya
+        if(!$gelombang) return back()->withErrors(['gelombang' => 'Akun pada gelombang tersebut belum dapat digunakan'])->withInput();
+
+        // Cek tanggal mulai
+        if($gelombang->tanggal_mulai != date('Y-m-d')) return back()->withErrors(['gelombang' => 'Akun anda pada gelombang tersebut belum saatnya atau sudah selesai'])->withInput();
+
+        // Cek status
         if($siswa->status == 'nonaktif') return back()->withErrors(['staus' => 'Peserta belum aktif'])->withInput();
 
+        $soal = Soal::count();
+
         // Jika data siswa ditemukan, kembalikan response sukses dengan data siswa
-        return view('test.peserta', compact('siswa', 'datetime'));
+        return view('test.peserta', compact('siswa', 'datetime', 'gelombang', 'soal'));
     }
 
     public function mulai_ujian($id_siswa)
     {
         // cek kalau sudah pernah ujian dan statusnya selesai → langsung ke halaman selesai
         $cek_ujian = Ujian::where('id_siswa', $id_siswa)->first();
+
         if ($cek_ujian && $cek_ujian->status == 'selesai') {
             // Hitung jumlah soal
             $soal = Soal::count();
@@ -373,13 +394,16 @@ class UserController extends Controller
             ->orderBy('urutan')
             ->get();
 
+        $setting_anti_inspect = SettingAntiInspectElement::first();
+
         return view('test.soal', [
             'siswa' => $siswa,
             'soal' => $soal_acak,
             'urutan' => $soal_acak->urutan,
             'tahap' => $ujian->tahap,
             'sisa_waktu' => $hasil_akhir,
-            'semua_soal' => $semua_soal
+            'semua_soal' => $semua_soal,
+            'anti_inspect' => $setting_anti_inspect->status
         ]);
     }
 
@@ -541,5 +565,17 @@ class UserController extends Controller
             'status' => true,
             'message' => 'Ujian berhasil direset'
         ]);
+    }
+
+    public function cek_gelombang($nisn)
+    {
+        $data = DB::table('accounts')
+                ->join('setting_gelombang', 'accounts.id_gelombang', '=', 'setting_gelombang.id_gelombang')
+                ->join('setting_duration', 'setting_gelombang.id_gelombang', '=', 'setting_duration.id_gelombang')
+                ->where('accounts.nisn', $nisn)
+                ->select('accounts.*', 'setting_gelombang.*', 'setting_duration.*')
+                ->first();
+
+        return $data;
     }
 }

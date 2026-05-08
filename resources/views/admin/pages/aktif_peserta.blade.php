@@ -13,7 +13,8 @@
     <h2 class="mb-4">Peserta</h2>
 
     <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#aktifPeserta" >Aktifkan Seluruh Peserta</button>
-
+    <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#aktifPesertaPergelombang" >Aktifkan Pergelombang</button>
+    <button class="btn btn-danger mb-3" data-bs-toggle="modal" data-bs-target="#nonaktifPesertaPergelombang" >Non-Aktifkan Pergelombang</button>
     <button class="btn btn-danger mb-3" data-bs-toggle="modal" data-bs-target="#nonaktifPeserta" >Non-Aktifkan Seluruh Peserta</button>
 
     <div class="card border-0 shadow-sm">
@@ -29,6 +30,7 @@
                             <th>NISN</th>
                             <th>Nama</th>
                             <th>Jurusan</th>
+                            <th>Gelombang</th>
                             <th>Status</th>
                         </tr>
                     </thead>
@@ -39,11 +41,12 @@
                                 <td>{{ $p->nisn }}</td>
                                 <td>{{ $p->name }}</td>
                                 <td>{{ $p->jurusan }}</td>
+                                <td>{{ $p->id_gelombang }}</td>
                                 <td>
                                     @if ($p->status == 'nonaktif')
                                         <a href="{{ route('admin.aktif_peserta.one_aktif', $p->id)}}" class="badge bg-danger">Non Active</a>
-                                    @elseif ($p->status == 'aktif') 
-                                        <a href="{{ route('admin.aktif_peserta.one_nonaktif', $p->id)}}" class="badge bg-success">Active</a>                                 
+                                    @elseif ($p->status == 'aktif')
+                                        <a href="{{ route('admin.aktif_peserta.one_nonaktif', $p->id)}}" class="badge bg-success">Active</a>
                                     @endif
                                 </td>
                             </tr>
@@ -54,7 +57,7 @@
         </div>
     </div>
 
-        <!-- Modal -->
+    <!-- Modal -->
     <div class="modal fade" id="aktifPeserta" tabindex="-1" aria-labelledby="aktifPesertaLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -70,6 +73,64 @@
                         <div class="d-flex justify-content-end">
                             <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Batal</button>
                             <button type="submit" class="btn btn-primary">Aktifkan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Pergelombang --}}
+    <div class="modal fade" id="aktifPesertaPergelombang" tabindex="-1" aria-labelledby="aktifPesertaLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="aktifPesertaLabel">Aktifkan Peserta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ route('admin.aktif_peserta.pergelombang') }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <label for="gelombang" class="form-label">Pilih Gelombang</label>
+                        <select class="form-control" name="gelombang" id="gelombang">
+                            <option value="1" selected>Gelombang 1</option>
+                            <option value="2">Gelombang 2</option>
+                            <option value="3">Gelombang 3</option>
+                            <option value="4">Gelombang 4</option>
+                        </select>
+                        <div class="d-flex justify-content-end mt-2">
+                            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary">Aktifkan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Pergelombang --}}
+    <div class="modal fade" id="nonaktifPesertaPergelombang" tabindex="-1" aria-labelledby="aktifPesertaLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="aktifPesertaLabel">Nonktifkan Peserta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ route('admin.nonaktif_peserta.pergelombang') }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <label for="gelombang" class="form-label">Pilih Gelombang</label>
+                        <select class="form-control" name="gelombang" id="gelombang">
+                            <option value="1" selected>Gelombang 1</option>
+                            <option value="2">Gelombang 2</option>
+                            <option value="3">Gelombang 3</option>
+                            <option value="4">Gelombang 4</option>
+                        </select>
+                        <div class="d-flex justify-content-end mt-2">
+                            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-danger">Aktifkan</button>
                         </div>
                     </form>
                 </div>
@@ -120,6 +181,6 @@
                     </div>
                 </div>
             </div>
-        </div>        
+        </div>
     @endforeach
 @endsection

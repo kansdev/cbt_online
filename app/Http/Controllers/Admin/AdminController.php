@@ -13,6 +13,7 @@ use App\Models\Ujian;
 use App\Models\LogsActivityUser;
 use App\Models\SettingWaktuTes;
 use App\Models\SettingGelombang;
+use App\Models\SettingAntiInspectElement;
 
 use App\Imports\SoalImport;
 use App\Exports\KoreksiExport;
@@ -31,7 +32,7 @@ class AdminController extends Controller
     }
 
     // Clear Log
-    public function clear_log() 
+    public function clear_log()
     {
         try {
             $logs = LogsActivityUser::query()->delete();
@@ -44,7 +45,7 @@ class AdminController extends Controller
             return redirect()->back()->with('success', 'Clear Log Successfully !!!');
         } catch(\Exception $e) {
             return redirect()->back()->with('failed', 'Clear Log Failed !!!');
-        }        
+        }
     }
 
     public function peserta()
@@ -59,13 +60,14 @@ class AdminController extends Controller
         return view('admin.pages.soal', compact('soal'));
     }
 
-    public function peserta_aktif() 
+    public function peserta_aktif()
     {
         $peserta_aktif = Account::all();
         return view('admin.pages.aktif_peserta', compact('peserta_aktif'));
     }
 
-    public function reset_peserta() {
+    public function reset_peserta()
+    {
         $peserta = Ujian::with('account')->get();
         return view('admin.pages.reset', compact('peserta'));
     }
@@ -144,7 +146,7 @@ class AdminController extends Controller
         return view('admin.pages.riwayat', compact('riwayat'));
     }
 
-    public function aktifkan_seluruh_peserta() 
+    public function aktifkan_seluruh_peserta()
     {
         try {
             Account::where('status', '!=', 'aktif')->update([
@@ -156,7 +158,39 @@ class AdminController extends Controller
         }
     }
 
-    public function nonaktifkan_seluruh_peserta() 
+    public function aktifkan_peserta_pergelombang(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'gelombang' => 'required'
+            ]);
+
+            Account::where('gelombang', $validated['gelombang'])->update(['status' => 'aktif']);
+
+            return redirect()->back()->with('success', 'Berhasil aktifkan peserta dengan gelombang ' . $validated['gelombang']);
+
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('failed', 'Gagal mengaktifkan peserta !!!');
+        }
+    }
+
+    public function nonaktifkan_peserta_pergelombang(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'gelombang' => 'required'
+            ]);
+
+            Account::where('gelombang', $validated['gelombang'])->update(['status' => 'nonaktif']);
+
+            return redirect()->back()->with('success', 'Berhasil aktifkan peserta dengan gelombang ' . $validated['gelombang']);
+
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('failed', 'Gagal mengaktifkan peserta !!!');
+        }
+    }
+
+    public function nonaktifkan_seluruh_peserta()
     {
         try {
             Account::where('status', '!=', 'nonaktif')->update([
@@ -168,7 +202,7 @@ class AdminController extends Controller
         }
     }
 
-    public function nonaktifkan_peserta($id) 
+    public function nonaktifkan_peserta($id)
     {
         try {
             $peserta = Account::findOrFail($id);
@@ -185,7 +219,7 @@ class AdminController extends Controller
         }
     }
 
-    public function aktifkan_peserta($id) 
+    public function aktifkan_peserta($id)
     {
         try {
             $peserta = Account::findOrFail($id);
@@ -238,7 +272,7 @@ class AdminController extends Controller
     }
 
     // Unduh hasil jawaban
-    public function unduh_hasil_jawaban() 
+    public function unduh_hasil_jawaban()
     {
         return Excel::download(new KoreksiExport, 'hasil_test.xlsx');
     }
@@ -246,7 +280,10 @@ class AdminController extends Controller
     // Settings
     public function settings() {
         $setting_gelombang = SettingGelombang::all();
-        return view('admin.pages.settings', compact('setting_gelombang'));
+        $setting_anti_inspect = SettingAntiInspectElement::first();
+
+        // dd($setting_anti_inspect);
+        return view('admin.pages.settings', compact('setting_gelombang', 'setting_anti_inspect'));
     }
 
     public function settings_waktu_tes(Request $request) {
@@ -275,7 +312,8 @@ class AdminController extends Controller
         }
     }
 
-    public function settings_gelombang(Request $request) {
+    public function settings_gelombang(Request $request)
+    {
         try {
             $validate = $request->validate([
                 'gelombang' => 'required|array|min:4',
@@ -298,6 +336,28 @@ class AdminController extends Controller
             return redirect()->back()->with('success', 'Gelombang berhasil di buat');
         } catch (\Exception $e) {
             return $e->getMessage();
+        }
+    }
+
+    public function settings_anti_inspect_element(Request $request)
+    {
+        try {
+            $value = $request->has('anti_inspect') ? 1 : 0;
+
+            SettingAntiInspectElement::updateOrCreate(
+                ['id' =>  '1'],
+                ['status' => $value]
+            );
+
+            if ($value == 1) {
+                # code...
+                return redirect()->back()->with('success', 'Berhasil diaktifkan');
+            } else {
+                return redirect()->back()->with('success', 'Berhasil di nonaktifkan');
+            }
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('success', 'Gagal diaktifkan ' . $e->getMessage());
         }
     }
 

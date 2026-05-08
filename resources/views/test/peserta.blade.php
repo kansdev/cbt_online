@@ -7,34 +7,34 @@
         <!-- Bootstrap 5 CSS -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
         <style>
-            body { 
-                background-color: #f4f7f6; 
-                font-family: 'Inter', sans-serif; 
+            body {
+                background-color: #f4f7f6;
+                font-family: 'Inter', sans-serif;
             }
 
-            .start-card { 
-                border: none; 
-                border-radius: 20px; 
-                overflow: hidden; 
-                box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
+            .start-card {
+                border: none;
+                border-radius: 20px;
+                overflow: hidden;
+                box-shadow: 0 15px 35px rgba(0,0,0,0.1);
             }
 
-            .header-gradient { 
-                background: linear-gradient(135deg, #0d6efd 0%, #003d99 100%); 
-                color: white; 
-                padding: 40px 20px; 
+            .header-gradient {
+                background: linear-gradient(135deg, #0d6efd 0%, #003d99 100%);
+                color: white;
+                padding: 40px 20px;
             }
 
-            .info-box { 
-                background-color: #f8f9fa; 
-                border-radius: 12px; 
-                padding: 20px; 
-                border-left: 5px solid #0d6efd; 
+            .info-box {
+                background-color: #f8f9fa;
+                border-radius: 12px;
+                padding: 20px;
+                border-left: 5px solid #0d6efd;
             }
 
-            .rule-list li { 
-                margin-bottom: 10px; 
-                color: #495057; 
+            .rule-list li {
+                margin-bottom: 10px;
+                color: #495057;
             }
         </style>
     </head>
@@ -43,7 +43,7 @@
         <div class="container my-5">
             <div class="row justify-content-center">
                 <div class="col-lg-10 col-xl-8">
-                    
+
                     <div class="card start-card">
                         <!-- Header Visual -->
                         <div class="header-gradient text-center">
@@ -72,7 +72,7 @@
                                         <label class="text-muted small d-block">Tanggal Ujian</label>
                                         <span class="fw-semibold fs-5">{{ $datetime }}</span>
                                     </div>
-                                    
+
                                     <div class="info-box shadow-sm">
                                         <div class="d-flex align-items-center mb-2">
                                             <strong class="me-auto text-primary">Detail Ujian:</strong>
@@ -80,11 +80,11 @@
                                         <div class="row text-center">
                                             <div class="col-6">
                                                 <small class="d-block text-muted">Durasi</small>
-                                                <span class="fw-bold">60 Menit</span>
+                                                <span class="fw-bold">{{ $gelombang->durasi }} Menit</span>
                                             </div>
                                             <div class="col-6 border-start">
                                                 <small class="d-block text-muted">Total Soal</small>
-                                                <span class="fw-bold">50 Soal</span>
+                                                <span class="fw-bold">{{ $soal }} Soal</span>
                                             </div>
                                         </div>
                                     </div>

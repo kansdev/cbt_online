@@ -14,6 +14,8 @@ Route::prefix('apps_ade')->group(function() {
     Route::get('/riwayat', [AdminController::class, 'riwayat'])->name('admin.riwayat');
     Route::post('/import-soal', [AdminController::class, 'importSoal'])->name('admin.import-soal');
     Route::put('/aktif-peserta/aktifkan', [AdminController::class, 'aktifkan_seluruh_peserta'])->name('admin.aktif_peserta.aktif');
+    Route::put('/aktif-peserta/aktifkan-pergelombang', [AdminController::class, 'aktifkan_peserta_pergelombang'])->name('admin.aktif_peserta.pergelombang');
+    Route::put('/aktif-peserta/nonaktifkan-pergelombang', [AdminController::class, 'nonaktifkan_peserta_pergelombang'])->name('admin.nonaktif_peserta.pergelombang');
     Route::put('/aktif-peserta/nonaktifkan', [AdminController::class, 'nonaktifkan_seluruh_peserta'])->name('admin.aktif_peserta.nonaktif');
     Route::get('/aktif-peserta/nonaktifkan-peserta/{id}', [AdminController::class, 'nonaktifkan_peserta'])->name('admin.aktif_peserta.one_nonaktif');
     Route::get('/aktif-peserta/aktifkan-peserta/{id}', [AdminController::class, 'aktifkan_peserta'])->name('admin.aktif_peserta.one_aktif');
@@ -23,6 +25,7 @@ Route::prefix('apps_ade')->group(function() {
     Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
     Route::post('/setting/durasi', [AdminController::class, 'settings_waktu_tes'])->name('admin.setting_durasi');
     Route::post('/setting/gelombang', [AdminController::class, 'settings_gelombang'])->name('admin.setting_gelombang');
+    Route::post('/setting/anti_inspect_element', [AdminController::class, 'settings_anti_inspect_element'])->name('admin.setting_anti_inspect_element');
 });
 
 Route::prefix('ujian')->group(function() {

@@ -10,7 +10,8 @@ class Account extends Model
         'name',
         'nisn',
         'jurusan',
-        'status'
+        'status',
+        'id_gelombang'
     ];
 
     public function log_activity_users() {

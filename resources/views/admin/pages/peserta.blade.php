@@ -18,8 +18,9 @@
                             <th>NIS/NISN</th>
                             <th>Nama</th>
                             <th>Jurusan</th>
+                            <th>Gelombang</th>
                             <th>Status</th>
-                        </tr>     
+                        </tr>
                     </thead>
                     <tbody>
                         @foreach ($peserta as $p)
@@ -28,11 +29,12 @@
                                 <td>{{ $p->nisn }}</td>
                                 <td>{{ $p->name }}</td>
                                 <td>{{ $p->jurusan }}</td>
+                                <td>{{ $p->id_gelombang }}</td>
                                 <td>
                                     @if ($p->status == 'nonaktif')
                                         <span class="badge bg-danger">Non Active</span>
-                                    @elseif ($p->status == 'aktif') 
-                                        <span class="badge bg-success">Active</span>                                 
+                                    @elseif ($p->status == 'aktif')
+                                        <span class="badge bg-success">Active</span>
                                     @endif
                                 </td>
                             </tr>
