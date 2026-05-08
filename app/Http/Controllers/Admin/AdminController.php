@@ -25,7 +25,7 @@ class AdminController extends Controller
     public function index()
     {
         $peserta = Account::count();
-        $laki_laki = Account::where('jenis_kelamin', 'Laki-Laki')->count();
+        $laki_laki = Account::where('jenis_kelamin', 'Laki - Laki')->count();
         $perempuan = Account::where('jenis_kelamin', 'Perempuan')->count();
 
         $log = LogsActivityUser::with('account')->orderBy('created_at', 'desc')->get();
