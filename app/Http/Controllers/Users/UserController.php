@@ -51,7 +51,7 @@ class UserController extends Controller
 
         // Cek status
         if($siswa->status == 'nonaktif') return back()->withErrors(['status' => 'Peserta belum aktif'])->withInput();
-        
+
         $soal_umum = Soal::where('jenis_soal', 'umum')->count();
         $soal_umum_kejuruan = Soal::where('jenis_soal', $siswa->jenis_umum)->count();
         $soal_kejuruan = Soal::where('jenis_soal', $siswa->jenis_kejuruan)->count();
@@ -482,7 +482,7 @@ class UserController extends Controller
     {
         $jurusan = strtoupper($siswa->jurusan);
         if($tahap == 'umum') {
-            if($jurusan == 'RPL') return ['mtk_umum', 'bindo_teknik', 'binggris_teknik'];
+            if($jurusan == 'PPLG') return ['mtk_umum', 'bindo_teknik', 'binggris_teknik'];
             if($jurusan == 'TJKT') return ['mtk_umum', 'bindo_teknik', 'binggris_teknik'];
             if($jurusan == 'DKV') return ['mtk_umum', 'bindo_seni', 'binggris_seni'];
             if($jurusan == 'BP') return ['mtk_umum', 'bindo_seni', 'binggris_seni'];
@@ -492,7 +492,7 @@ class UserController extends Controller
         }
 
         if($tahap == 'kejuruan') {
-            if ($jurusan == 'RPL') return ['rpl_tkj'];
+            if ($jurusan == 'PPLG') return ['rpl_tkj'];
             if ($jurusan == 'TJKT') return ['rpl_tkj'];
             if ($jurusan == 'DKV') return ['an_dkv_bp'];
             if ($jurusan == 'BP') return ['an_dkv_bp'];
