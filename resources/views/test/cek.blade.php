@@ -70,7 +70,7 @@
                                     <input type="text" class="form-control form-control-lg" id="nisn" name="nisn" placeholder="Contoh: 0085370210" required autocomplete="off"
                                     >
                                     <div class="form-text mt-2">
-                                        Gunakan NISN yang ada di prunus digidaw.
+                                        Gunakan No. Registrasi / NISN anda
                                     </div>
                                 </div>
 
