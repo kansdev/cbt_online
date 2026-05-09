@@ -41,22 +41,22 @@ class KoreksiExport implements FromCollection, WithHeadings, WithEvents, WithCus
                 }
 
                 // TOTAL SOAL (bukan jumlah jawaban!)
-                $jumlah_soal = Soal::count();
+                // $jumlah_soal = Soal::count();
 
                 $jumlah_jawaban = Jawaban::where('id_siswa', $items[0]->id_siswa)->count();
 
                 //Jumlah soal yang di jawab
                 $jumlah_soal_acak = SoalAcak::where('id_siswa', $items[0]->id_siswa)->count();
 
-                $soal_tidak_dijawab = $jumlah_soal - $jumlah_soal_acak;
-                $nilai = $jumlah_soal > 0
-                    ? round(($benar / $jumlah_soal) * 100, 2)
+                $soal_tidak_dijawab = 50 - $jumlah_soal_acak;
+                $nilai = 50 > 0
+                    ? round(($benar / 50) * 100, 2)
                     : 0;
 
                 return [
                     'id_siswa' => $items[0]->id_siswa,
-                    'nama' => $items[0]->account->name,
-                    'jumlah_soal' => $jumlah_soal,
+                    'nama' => $items[0]->account->nama,
+                    'jumlah_soal' => 50,
                     'benar' => $benar,
                     'salah' => $salah,
                     'soal_tidak_dijawab' => $soal_tidak_dijawab ?? '0',
