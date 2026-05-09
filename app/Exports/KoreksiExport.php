@@ -55,7 +55,7 @@ class KoreksiExport implements FromCollection, WithHeadings, WithEvents, WithCus
 
                 return [
                     'id_siswa' => $items[0]->id_siswa,
-                    'name' => $items[0]->account->name,
+                    'nama' => $items[0]->account->name,
                     'jumlah_soal' => $jumlah_soal,
                     'benar' => $benar,
                     'salah' => $salah,
@@ -100,10 +100,10 @@ class KoreksiExport implements FromCollection, WithHeadings, WithEvents, WithCus
                 $sheet->getStyle('A7:G7')->getFont()->setBold(true);
                 $sheet->getStyle('A7:G7')->getAlignment()->setHorizontal('center')->setVertical('center');
 
-                // Memasang border 
+                // Memasang border
                 $lastRow = $sheet->getHighestRow();
                 $sheet->getStyle('A7:G' . $lastRow)->applyFromArray($styleArray);
-            } 
+            }
         ];
     }
 }
