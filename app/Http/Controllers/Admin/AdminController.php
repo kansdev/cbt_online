@@ -149,6 +149,30 @@ class AdminController extends Controller
         return view('admin.pages.riwayat', compact('riwayat'));
     }
 
+    public function tambah_peserta(Request $request) {
+        try {
+            $validate = $request->validate([
+                'nomor_registrasi' => 'required',
+                'nama' => 'required',
+                'nisn' => 'required',
+                'jenis_kelamin' => 'required',
+                'jurusan' => 'required',
+                'kategori' => 'required',
+                'jenis_umum' => 'required',
+                'jenis_kejuruan' => 'required',
+                'tanggal_lahir' => 'required',
+                'id_gelombang' => 'required',
+                'status' => 'required'
+            ]);
+
+            Account::create($validate);
+
+            return redirect()->route('admin.peserta')->with('success', 'Berhasil menambahkan peserta baru. ');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.peserta')->with('failed', 'Gagal menambahkan peserta baru. ' . $e->getMessage());
+        }
+    }
+
     public function aktifkan_seluruh_peserta()
     {
         try {
