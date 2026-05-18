@@ -43,10 +43,9 @@ class ExamController extends Controller
     public function koreksi()
     {
         // Ambil data jawaban 
-        $jawaban = Jawaban::with(['account', 'soal'])
-            ->paginate(10)
+        $jawaban = Jawaban::with(['account', 'soal'])            
             ->orderBy('id_siswa', 'asc')
-            ->get();
+            ->paginate(20);
 
         // Ambil data detail jawaban untuk setiap siswa
         $details = Jawaban::with(['account', 'soal'])
@@ -94,6 +93,7 @@ class ExamController extends Controller
                 // Kembalikan data detail jawaban beserta jumlah benar, salah dan nilai untuk setiap siswa
                 return [
                     'id_siswa' => $items[0]->id_siswa,
+                    'nomor_registrasi' => $items[0]->account->nomor_registrasi,
                     'nama' => $items[0]->account->nama,
                     'jumlah_soal' => 50,
                     'benar' => $benar,
@@ -118,7 +118,7 @@ class ExamController extends Controller
     public function riwayat()
     {
         // Ambil data riwayat ujian berdasakan waktu selesai ujian
-        $riwayat = Ujian::with('account')->paginate(10)->orderBy('selesai_at', 'desc')->get();
+        $riwayat = Ujian::with('account')->orderBy('selesai_at', 'desc')->paginate(20);
 
         // Tampilkan halaman riwayat dengan data riwayat ujian
         return view('admin.pages.riwayat', compact('riwayat'));

@@ -317,7 +317,7 @@ class UserController extends Controller
             // Update tahap ke kejuruan
             $ujian->update(['tahap' => 'kejuruan']);
 
-            // Generat soal kejuruan jika belum ada
+            // Generate soal kejuruan jika belum ada
             if(SoalAcak::with('soal')
                 ->where('id_siswa', $siswa->id)
                 ->where('tahap', 'kejuruan')

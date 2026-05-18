@@ -30,15 +30,15 @@
                         @foreach ($peserta as $p)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
-                                <td>{{ $p->nisn }}</td>
-                                <td>{{ $p->account->name }}</td>
-                                <td>{{ $p->account->jurusan }}</td>
-                                <td>{{ ucfirst($p->status) }}</td>
+                                <td>{{ $p->ujian->nisn }}</td>
+                                <td>{{ $p->nama }}</td>
+                                <td>{{ $p->jurusan }}</td>
+                                <td>{{ ucfirst($p->ujian->status) }}</td>
                                 <td>
-                                    @if ($p->status == 'selesai')
-                                        <a href="{{ route('admin.reset', $p->id_siswa) }}" class="badge bg-danger">Reset</a>
-                                    @elseif ($p->status == 'mulai')
-                                        <a href="{{ route('admin.reset', $p->id_siswa) }}" class="badge bg-secondary">Reset</a>
+                                    @if ($p->ujian->status == 'selesai')
+                                        <a href="{{ route('admin.reset', $p->ujian->id_siswa) }}" class="badge bg-danger">Reset</a>
+                                    @elseif ($p->ujian->status == 'mulai')
+                                        <a href="{{ route('admin.reset', $p->ujian->id_siswa) }}" class="badge bg-secondary">Reset</a>
                                     @endif
                                 </td>
                             </tr>

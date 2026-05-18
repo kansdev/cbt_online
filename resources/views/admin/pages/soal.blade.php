@@ -7,6 +7,14 @@
         Upload Soal
     </button>
 
+    <a href="#" class="btn btn-success mb-3" onclick="return confirm('Apakah anda yakin ingin menghapus semua soal ?')">
+        Hapus Soal
+        <form id="deleteForm" action="{{ route('exam.delete-all') }}" method="POST" style="display: none;">
+            @csrf
+            @method('DELETE')
+        </form>
+    </a>
+
     @if (session('failed'))
         <div class="alert alert-danger">{{ session('failed') }}</div>
     @endif
@@ -24,7 +32,7 @@
                             <th>Jenis Soal</th>
                             <th>Kategori</th>
                             <th>Soal</th>
-                            <th>Status</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -33,8 +41,7 @@
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $s->jenis_soal}}</td>
                                 <td>{{ $s->kategori }}</td>
-                                <td>{{ $s->pertanyaan }}</td>
-                                <td><span class="badge bg-success">Active</span></td>
+                                <td>{{ $s->pertanyaan }}</td>                                
                             </tr>
                         @endforeach
                     </tbody>

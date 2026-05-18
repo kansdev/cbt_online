@@ -131,7 +131,7 @@
                     </form>
                 </div>
 
-                <!-- Panel Gelombang -->
+                <!-- Panel setting inspect -->
                 <div class="tab-pane fade" id="keamanan-pane" role="tabpanel" tabindex="0">
                     <form id="formAntiInspect" action="{{ route('admin.setting_anti_inspect_element') }}" method="POST">
                         @csrf
@@ -148,7 +148,7 @@
                         </div>
                     </form>
 
-                    <form action="#" method="POST">
+                    {{-- <form action="#" method="POST">
                         @csrf
                         <div class="row g-3">
                             <div class="col-md-8">
@@ -176,7 +176,7 @@
                                 </div>
                             </div>
                         </div>
-                    </form>
+                    </form> --}}
                 </div>
 
             </div>

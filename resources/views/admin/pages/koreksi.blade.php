@@ -60,13 +60,14 @@
             <div class="modal-dialog modal-dialog-scrollable modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="detailJawabanLabel{{ $d['id_siswa'] }}">Detail Jawaban - {{ $d['nama'] }}</h5>
+                        <h1 class="modal-title" id="detailJawabanLabel{{ $d['id_siswa'] }}">Detail Jawaban - <b>{{ $d['nama'] }} - {{ $d['nomor_registrasi'] }}</b></h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <table class="table table-bordered" id="dataTable">
                             <thead>
                                 <tr>
+                                    <th>Nomor</th>
                                     <th>Pertanyaan</th>
                                     <th>Jawaban Siswa</th>
                                     <th>Kunci Jawaban</th>
@@ -76,6 +77,7 @@
                             <tbody>
                                 @foreach ($d['detail'] as $detail)
                                     <tr>
+                                        <td>{{ $loop->iteration}}</td>
                                         <td>{{ $detail['pertanyaan'] }}</td>
                                         <td>{{ $detail['jawaban'] }}</td>
                                         <td>{{ $detail['kunci_jawaban'] }}</td>

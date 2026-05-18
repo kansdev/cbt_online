@@ -9,15 +9,13 @@ use App\Http\Controllers\Admin\ParticipantController;
 use App\Http\Controllers\Admin\ExamController;
 use App\Http\Controllers\Admin\SettingController;
 
-Route::prefix('apps_ade')->group(function() {
-
-    Route::get('/', [AuthController::class, 'login'])->name('login');
-    
+Route::prefix('apps_ade')->group(function() {    
     Route::middleware('guest')->group(function() {
+        Route::get('/', [AuthController::class, 'login'])->name('login');
         Route::post('/login/process', [AuthController::class, 'login_process'])->name('admin.login_process');
     });
         
-    Route::middleware('auth')->group(function() {
+    Route::middleware('auth', 'prevent-back-history', 'session-timeout')->group(function() {
         // Get    
         // Beranda
         Route::get('/beranda', [AdminController::class, 'index'])->name('admin.index');
@@ -40,22 +38,22 @@ Route::prefix('apps_ade')->group(function() {
         Route::get('/settings', [SettingController::class, 'settings'])->name('admin.settings');
         
         // Auth
-        Route::get('/logout', [AdminController::class, 'logout'])->name('admin.logout');
+        Route::get('/logout', [AuthController::class, 'logout'])->name('admin.logout');
         
         // Post    
-        Route::post('/peserta/tambah-peserta', [AdminController::class, 'tambah_peserta'])->name('admin.tambah_peserta');
-        Route::post('/import-soal', [AdminController::class, 'importSoal'])->name('admin.import-soal');
-        Route::post('/import-peserta', [AdminController::class, 'importPeserta'])->name('admin.import-peserta');
-        Route::post('/setting/durasi', [AdminController::class, 'settings_waktu_tes'])->name('admin.setting_durasi');
-        Route::post('/setting/gelombang', [AdminController::class, 'settings_gelombang'])->name('admin.setting_gelombang');
-        Route::post('/setting/anti_inspect_element', [AdminController::class, 'settings_anti_inspect_element'])->name('admin.setting_anti_inspect_element');
+        Route::post('/peserta/tambah-peserta', [ParticipantController::class, 'tambah_peserta'])->name('admin.tambah_peserta');
+        Route::post('/import-soal', [ExamController::class, 'importSoal'])->name('admin.import-soal');
+        Route::post('/import-peserta', [ParticipantController::class, 'importPeserta'])->name('admin.import-peserta');
+        Route::post('/setting/durasi', [SettingController::class, 'settings_waktu_tes'])->name('admin.setting_durasi');
+        Route::post('/setting/gelombang', [SettingController::class, 'settings_gelombang'])->name('admin.setting_gelombang');
+        Route::post('/setting/anti_inspect_element', [SettingController::class, 'settings_anti_inspect_element'])->name('admin.setting_anti_inspect_element');
         
 
         // Put | Update
-        Route::put('/aktif-peserta/aktifkan', [AdminController::class, 'aktifkan_seluruh_peserta'])->name('admin.aktif_peserta.aktif');
-        Route::put('/aktif-peserta/aktifkan-pergelombang', [AdminController::class, 'aktifkan_peserta_pergelombang'])->name('admin.aktif_peserta.pergelombang');
-        Route::put('/aktif-peserta/nonaktifkan-pergelombang', [AdminController::class, 'nonaktifkan_peserta_pergelombang'])->name('admin.nonaktif_peserta.pergelombang');
-        Route::put('/aktif-peserta/nonaktifkan', [AdminController::class, 'nonaktifkan_seluruh_peserta'])->name('admin.aktif_peserta.nonaktif');
+        Route::put('/aktif-peserta/aktifkan', [ParticipantController::class, 'aktifkan_seluruh_peserta'])->name('admin.aktif_peserta.aktif');
+        Route::put('/aktif-peserta/aktifkan-pergelombang', [ParticipantController::class, 'aktifkan_peserta_pergelombang'])->name('admin.aktif_peserta.pergelombang');
+        Route::put('/aktif-peserta/nonaktifkan-pergelombang', [ParticipantController::class, 'nonaktifkan_peserta_pergelombang'])->name('admin.nonaktif_peserta.pergelombang');
+        Route::put('/aktif-peserta/nonaktifkan', [ParticipantController::class, 'nonaktifkan_seluruh_peserta'])->name('admin.aktif_peserta.nonaktif');
         
         // Delete 
         Route::delete('/clear_log', [AdminController::class, 'clear_log'])->name('admin.clear_log');  
