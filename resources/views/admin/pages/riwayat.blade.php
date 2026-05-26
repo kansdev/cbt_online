@@ -18,7 +18,6 @@
                             <th>Tahap Akhir</th>
                             <th>Waktu Mulai</th>
                             <th>Waktu Selesai</th>
-                            <th>Detail</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -28,17 +27,12 @@
                         @foreach ($riwayat as $r)
                             <tr>
 
-                                <td>{{$no++}}</td>
+                                <td>{{ $loop->iteration }}</td>
                                 <td>{{ $r->account->nisn }}</td>
                                 <td>{{ $r->status }}</td>
                                 <td>{{ $r->tahap }}</td>
                                 <td>{{ $r->mulai_at }}</td>
-                                <td>{{ $r->selesai_at }}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#detailRiwayat{{ $r->account->nisn }}">
-                                        Lihat Detail
-                                    </button>
-                                </td>
+                                <td>{{ $r->selesai_at }}</td>                                
                             </tr>
                         @endforeach
                     </tbody>

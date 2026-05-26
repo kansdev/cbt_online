@@ -76,7 +76,7 @@
                             <th>User</th>
                             <th>Aktivitas</th>
                             <th>IP Address</th>
-                            <th>Browser</th>
+                            {{-- <th>Browser</th> --}}
                             <th>Waktu</th>
                         </tr>      
                     </thead>
@@ -84,10 +84,10 @@
                         @foreach ($log as $l)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
-                                <td>{{ $l->account->name }}</td>
+                                <td>{{ $l->account->nama }}</td>
                                 <td>{{ $l->activity }}</td>
                                 <td>{{ $l->ip_address }}</td>
-                                <td>{{ $l->user_agent }}</td>
+                                {{-- <td>{{ $l->user_agent }}</td> --}}
                                 <td>{{ $l->created_at }}</td>
                             </tr>
                         @endforeach

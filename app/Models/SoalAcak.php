@@ -23,4 +23,11 @@ class SoalAcak extends Model
     {
         return $this->belongsTo(Soal::class, 'id_soal', 'id');
     }
+
+    // Tambahkan ini jika Anda ingin menggunakan eager loading jawaban nanti
+    public function jawaban_user()
+    {
+        return $this->hasOne(Jawaban::class, 'id_soal', 'id_soal')
+                    ->where('id_siswa', $this->id_siswa);
+    }
 }
