@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB; // WAJIB TAMBAHKAN INI
 use Illuminate\Support\Facades\Validator; // Opsi untuk validasi manual jika perlu
 
 use App\Models\Account; // WAJIB DIIMPORT
+use App\Models\Ujian; // WAJIB DIIMPORT
 use App\Models\Soal;    // WAJIB DIIMPORT
 use Carbon\Carbon;      // WAJIB DIIMPORT
 
@@ -22,14 +23,17 @@ class CekPesertaController extends Controller
         ]);
 
         $siswa = Account::where(function ($query) use ($validate) {
-            $query->where('nisn', $validate['nisn'])
-                  ->orWhere('nomor_registrasi', $validate['nisn'])
-                  ->orWhere('id_gelombang', $validate['gelombang']);
-        })->first();
+            $query->where('nisn', $validate['nisn'])->orWhere('nomor_registrasi', $validate['nisn']);
+        })
+        ->where('id_gelombang', $validate['gelombang'])
+        ->first();
 
+        
         if(!$siswa) return response()->json([
             'message' => "Peserta dengan NISN {$validate['nisn']} tidak ditemukan. Hubungi operator"
         ], 404);
+            
+        $ujian = Ujian::where('id_siswa', $siswa->id)->first();
 
         if($siswa->id_gelombang != $validate['gelombang']) return response()->json([
             'message' => 'Akun anda belum masuk pada jadwal gelombang manapun. Hubungi operator'
@@ -57,19 +61,21 @@ class CekPesertaController extends Controller
                 'id' => $siswa->id,
                 'nama' => $siswa->nama,
                 'nisn' => $siswa->nisn,
-                'gelombang' => $siswa->gelombang,
+                'gelombang' => $siswa->id_gelombang,
                 'jenis_umum' => $siswa->jenis_umum,
                 'jenis_kejuruan' => $siswa->jenis_kejuruan,
                 'status' => $siswa->status,
                 'jumlah_soal' => $soal,
-                'datetime' => $datetime
+                'datetime' => $datetime,
+                'nomor_pendaftaran' => $siswa->nomor_registrasi,
+                'status_ujian' => $ujian?->status
             ]
         ], 200);
     }
 
     public function persiapan_ujian($id_siswa) {
         $siswa = DB::table('accounts')
-                ->join('setting_gelombang', 'account.id_gelombang', '=', 'setting_gelombang.id_gelombang')
+                ->join('setting_gelombang', 'accounts.id_gelombang', '=', 'setting_gelombang.id_gelombang')
                 ->join('setting_duration', 'setting_gelombang.id_gelombang', '=', 'setting_duration.id_gelombang')
                 ->where('accounts.id', $id_siswa)
                 ->select(
@@ -99,7 +105,7 @@ class CekPesertaController extends Controller
                 'id' => $siswa->id,
                 'nama' => $siswa->nama,
                 'nisn' => $siswa->nisn,
-                'gelombang' => $siswa->gelombang,
+                'gelombang' => $siswa->id_gelombang,
                 'jenis_umum' => $siswa->jenis_umum,
                 'jenis_kejuruan' => $siswa->jenis_kejuruan,
                 'status' => $siswa->status,

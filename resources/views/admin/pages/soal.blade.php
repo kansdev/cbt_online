@@ -9,7 +9,7 @@
 
     <a href="#" class="btn btn-success mb-3" onclick="return confirm('Apakah anda yakin ingin menghapus semua soal ?')">
         Hapus Soal
-        <form id="deleteForm" action="{{ route('exam.delete-all') }}" method="POST" style="display: none;">
+        <form id="deleteForm" action="#" method="POST" style="display: none;">
             @csrf
             @method('DELETE')
         </form>

@@ -39,79 +39,92 @@ class ExamController extends Controller
         return redirect()->back()->with('success', 'Berhasil reset ujian');
     }
 
-    // Koreksi jawaban peserta
-    public function koreksi()
+    public function koreksi(Request $request)
     {
-        // Ambil data jawaban 
-        $jawaban = Jawaban::with(['account', 'soal'])            
-            ->orderBy('id_siswa', 'asc')
-            ->paginate(20);
+        $search = $request->input('search');
 
-        // Ambil data detail jawaban untuk setiap siswa
-        $details = Jawaban::with(['account', 'soal'])
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'id_siswa' => $item->id_siswa,
-                    'nama' => $item->account->nama,
-                    'pertanyaan' => $item->soal->pertanyaan,
-                    'jawaban' => $item->jawaban,
-                    'kunci_jawaban' => $item->soal->kunci_jawaban,
-                ];
-            });
-
-        // Ambil data detail jawaban untuk setiap siswa dan hitung jumlah benar, salah dan nilai
-        $detail_jawaban = Jawaban::with(['soal', 'account'])
-            ->get()
-            ->groupBy('id_siswa')
-            ->map(function($items) {
-                $benar = 0;
-                $salah = 0;
-                foreach($items as $item) {
-                    if($item->jawaban === $item->soal->kunci_jawaban) {
-                        $benar++;
-                    } else {
-                        $salah++;
-                    }
+        // 1. Ambil ID Siswa secara unik dengan pagination
+        // Kita filter berdasarkan relasi account jika ada pencarian
+        $paginator = Jawaban::select('id_siswa')
+            ->with(['account'])
+            ->whereHas('account', function($query) use ($search) {
+                if ($search) {
+                    $query->where('nama', 'like', "%{$search}%")
+                          ->orWhere('nomor_registrasi', 'like', "%{$search}%");
                 }
+            })
+            ->groupBy('id_siswa')
+            ->orderBy('id_siswa', 'asc')
+            ->paginate(10);
 
-                // TOTAL SOAL (bukan jumlah jawaban!)
-                // $jumlah_soal = Soal::count();
+        // 2. Olah data collection di dalam paginator
+        $itemsKoreksi = $paginator->getCollection()->map(function($firstItem) {
+            $id_siswa = $firstItem->id_siswa;
 
-                // Jumlah jawaban yang di jawab
-                $jumlah_jawaban = Jawaban::where('id_siswa', $items[0]->id_siswa)->count();
+            // Ambil semua jawaban milik siswa ini beserta relasi soalnya
+            $allJawabanSiswa = Jawaban::with('soal')
+                ->where('id_siswa', $id_siswa)
+                ->get();
 
-                //Jumlah soal yang di jawab
-                $jumlah_soal_acak = SoalAcak::where('id_siswa', $items[0]->id_siswa)->count();
+            // Ambil total soal yang dialokasikan dari tabel SoalAcak secara dinamis
+            $totalUmum = SoalAcak::where('id_siswa', $id_siswa)->where('tahap', 'umum')->count();
+            $totalKejuruan = SoalAcak::where('id_siswa', $id_siswa)->where('tahap', 'kejuruan')->count();
 
-                // Julah soal yang tidak di jawab
-                $soal_tidak_dijawab = 50 - $jumlah_soal_acak;
-                
-                // Hitung nilai dengan rumus (benar / total soal) * 100
-                $nilai = 50 > 0 ? round(($benar / 50) * 100, 2) : 0;
+            $umum = ['benar' => 0, 'salah' => 0, 'total' => $totalUmum];
+            $kejuruan = ['benar' => 0, 'salah' => 0, 'total' => $totalKejuruan];
 
-                // Kembalikan data detail jawaban beserta jumlah benar, salah dan nilai untuk setiap siswa
-                return [
-                    'id_siswa' => $items[0]->id_siswa,
-                    'nomor_registrasi' => $items[0]->account->nomor_registrasi,
-                    'nama' => $items[0]->account->nama,
-                    'jumlah_soal' => 50,
-                    'benar' => $benar,
-                    'salah' => $salah,
-                    'soal_tidak_dijawab' => $soal_tidak_dijawab,
-                    'nilai' => $nilai,
-                    'detail' => $items->map(function($item) {
-                        return [
-                            'pertanyaan' => $item->soal->pertanyaan,
-                            'jawaban' => $item->jawaban,
-                            'kunci_jawaban' => $item->soal->kunci_jawaban,
-                        ];
-                    }),
-                ];
-            });
+            foreach($allJawabanSiswa as $item) {
+                // Gunakan optional() untuk menghindari error jika soal terhapus di DB
+                $kunci = optional($item->soal)->kunci_jawaban;
+                $isBenar = $item->jawaban === $kunci;
 
-        // Tampilkan halaman koreksi dengan data detail benar, salah dan nilai untuk setiap siswa
-        return view('admin.pages.koreksi', compact('detail_jawaban', 'jawaban', 'details'));
+                if ($item->tahap === 'umum') {
+                    $isBenar ? $umum['benar']++ : $umum['salah']++;
+                } else {
+                    $isBenar ? $kejuruan['benar']++ : $kejuruan['salah']++;
+                }
+            }
+
+            // Hitung Skor (Skala 100)
+            $skor_umum = $totalUmum > 0 ? round(($umum['benar'] / $totalUmum) * 100, 2) : 0;
+            $skor_kejuruan = $totalKejuruan > 0 ? round(($kejuruan['benar'] / $totalKejuruan) * 100, 2) : 0;
+            
+            $total_soal = $totalUmum + $totalKejuruan;
+            $total_benar = $umum['benar'] + $kejuruan['benar'];
+            $nilai_total = $total_soal > 0 ? round(($total_benar / $total_soal) * 100, 2) : 0;
+
+            return [
+                'id_siswa' => $id_siswa,
+                'nama' => $firstItem->account->nama ?? 'N/A',
+                'nomor_registrasi' => $firstItem->account->nomor_registrasi ?? '-',
+                'umum' => $umum,
+                'kejuruan' => $kejuruan,
+                'soal_umum' => $totalUmum,
+                'soal_kejuruan' => $totalKejuruan,
+                'skor_umum' => $skor_umum,
+                'skor_kejuruan' => $skor_kejuruan,
+                'total_benar' => $total_benar,
+                'total_soal' => $total_soal,
+                'nilai' => $nilai_total,
+                // Map detail agar menjadi array murni untuk Blade
+                'detail' => $allJawabanSiswa->map(function($j) {
+                    return [
+                        'tahap' => $j->tahap,
+                        'pertanyaan' => optional($j->soal)->pertanyaan ?? 'Soal tidak ditemukan',
+                        'jawaban' => $j->jawaban,
+                        'kunci_jawaban' => optional($j->soal)->kunci_jawaban ?? '-',
+                    ];
+                })
+            ];
+        });
+
+        // 3. Kembalikan data yang sudah diolah ke paginator
+        $paginator->setCollection($itemsKoreksi);
+
+        return view('admin.pages.koreksi', [
+            'detail_jawaban' => $paginator,
+            'search' => $search
+        ]);
     }
 
     // Fungsi untuk menampilkan riwayat ujian peserta
