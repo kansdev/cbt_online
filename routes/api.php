@@ -15,7 +15,7 @@ Route::get('/ujian/soal/{id_siswa}', [ExamController::class, 'halaman_soal']);
 Route::post('/ujian/simpan-batch', [ExamController::class, 'simpan_batch']);
 
 // wawancara sesi
-Route::post('/wawancara/login', [WawancaraController::class, 'login_pewawancara']);
+Route::post('/wawancara/login/{nip}', [WawancaraController::class, 'login_pewawancara']);
 Route::get('/wawancara/{id}', [WawancaraController::class, 'show']);
 Route::post('/wawancara/simpan', [WawancaraController::class, 'simpan']);
 
