@@ -7,11 +7,12 @@ use Illuminate\Http\Request;
 use Exception;
 
 use App\Models\Wawancara;
+
 class WawancaraController extends Controller
 {
     public function login_pewawancara(Request $request) {
         $nip = $request->nip;
-        $pewawancara = Pewawancara::where('nip', $nip)->first();
+        $pewawancara = Wawancara::where('nip', $nip)->first();
 
         if($pewawancara) {
             return response()->json([
@@ -25,7 +26,7 @@ class WawancaraController extends Controller
             ], 404);
         }
     }
-    
+
     public function simpan(Request $request) {
 
         DB::beginTransaction();
