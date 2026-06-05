@@ -4,15 +4,19 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Exception;
 
+use App\Models\Pewawancara;
 use App\Models\Wawancara;
+use App\Models\WawancaraDetail;
+use App\Models\WawancaraDeskripsi;
 
 class WawancaraController extends Controller
 {
     public function login_pewawancara(Request $request) {
         $nip = $request->nip;
-        $pewawancara = Wawancara::where('nip', $nip)->first();
+        $pewawancara = Pewawancara::where('nip', $nip)->first();
 
         if($pewawancara) {
             return response()->json([
