@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('wawancara', function (Blueprint $table) {
             $table->id();
-            $table->foreignedId('pewawancara_id')->constrainer('pewawancara');
+            $table->foreignId('pewawancara_id')->constrained('pewawancara');
             $table->unsignedBigInteger('user_id');
             $table->string('nomor_pendaftaran')->unique();
             $table->text('catatan');
