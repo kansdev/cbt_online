@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('wawancara_details', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('wawancara_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('pewawancara_id')->constrained()->cascadeOnDelete();
             $table->string('kode_pertanyaan');
             $table->tinyInteger('skor');
             $table->timestamps();
