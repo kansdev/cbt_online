@@ -9,7 +9,7 @@ class WawancaraDeskripsi extends Model
     protected $table = "wawancara_deskripsi";
 
     protected $fillable = [
-        'wawancara_id',
+        'pewawancara_id',
         'kategori',
         'deskripsi'
     ];
