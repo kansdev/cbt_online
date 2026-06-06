@@ -70,7 +70,9 @@ class WawancaraController extends Controller
             DB::rollback();
             return response()->json([
                 'status' => 'error',
-                'message' => 'Gagal menyimpan wawancara'
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
             ], 500);
         }
     }
