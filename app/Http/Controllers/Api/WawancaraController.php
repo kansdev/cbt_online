@@ -37,7 +37,7 @@ class WawancaraController extends Controller
         
         try {
             $wawancara = Wawancara::create([
-                'pewawancara_id' => $request->pewawancara_id,
+                'pewawancara_id' => $request->id,
                 'user_id' => $request->user_id,
                 'nomor_pendaftaran' => $request->nomor_pendaftaran,
                 'catatan' => $request->catatan,
