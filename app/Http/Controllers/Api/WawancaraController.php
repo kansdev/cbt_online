@@ -20,12 +20,12 @@ class WawancaraController extends Controller
 
         if($pewawancara) {
             return response()->json([
-                'success' => true,
+                'status' => 'success',
                 'data' => $pewawancara
             ]);
         } else {
             return response()->json([
-                'success' => false,
+                'status' => 'error',
                 'message' => 'Pewawancara tidak ditemukan'
             ], 404);
         }
@@ -63,13 +63,13 @@ class WawancaraController extends Controller
             DB::commit();
 
             return response()->json([
-                'success' => true,
+                'status' => 'success',
                 'message' => 'Wawancara berhasil disimpan'
             ]);
         } catch (Exception $e) {
             DB::rollback();
             return response()->json([
-                'success' => false,
+                'status' => 'error',
                 'message' => 'Gagal menyimpan wawancara'
             ], 500);
         }
@@ -78,7 +78,7 @@ class WawancaraController extends Controller
     public function show($id) {
         $wawancara = Wawancara::with(['details', 'deskripsi', 'pewawancara'])->findOrFail($id);
         return response()->json([
-            'success' => true,
+            'status' => 'success',
             'data' => $wawancara
         ]);
     }
