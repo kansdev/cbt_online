@@ -46,7 +46,7 @@ class WawancaraController extends Controller
 
             foreach($request->jawaban as $kode => $skor) {
                 WawancaraDetail::create([
-                    'pewawancara_id' => $wawancara->pewawancara['id'],
+                    'pewawancara_id' => $request->pewawancara['id'],
                     'kode_pertanyaan' => $kode,
                     'skor' => $skor
                 ]);
@@ -54,7 +54,7 @@ class WawancaraController extends Controller
 
             foreach($request->deskripsi as $kategori => $deskripsi) {
                 WawancaraDeskripsi::create([
-                    'pewawancara_id' => $wawancara->pewawancara['id'],
+                    'pewawancara_id' => $request->pewawancara['id'],
                     'kategori' => $kategori,
                     'deskripsi' => $deskripsi
                 ]);
