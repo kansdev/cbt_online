@@ -24,45 +24,55 @@ class ExamController extends Controller
 
     public function mulai_ujian($id_siswa)
     {
-        $siswa = Account::findOrFail($id_siswa);
+        try {
+            $siswa = Account::findOrFail($id_siswa);
         
-        // 1. Ambil atau buat data ujian
-        $ujian = Ujian::firstOrCreate(
-            ['id_siswa' => $id_siswa],
-            [
-                'nisn' => $siswa->nisn,
-                'status' => 'mulai',
-                'tahap' => 'umum',
-                'mulai_at' => now(),
-            ]
-        );
+            // 1. Ambil atau buat data ujian
+            $ujian = Ujian::firstOrCreate(
+                ['id_siswa' => $id_siswa],
+                [
+                    'nisn' => $siswa->nisn,
+                    'status' => 'mulai',
+                    'tahap' => 'umum',
+                    'mulai_at' => now(),
+                ]
+            );
 
-        // 2. PAKSA GENERATE jika soal belum ada
-        $soal_count = SoalAcak::where('id_siswa', $id_siswa)->where('tahap', $ujian->tahap)->count();
-        if($soal_count == 0) {
-            $this->generate_soal($siswa, $ujian->tahap);
-            
-            // Cek lagi setelah generate, jika masih 0 berarti database soal kamu kosong untuk kategori tersebut
-            $recheck = SoalAcak::where('id_siswa', $id_siswa)->where('tahap', $ujian->tahap)->count();
-            if($recheck == 0) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Gagal generate soal. Pastikan bank soal untuk kategori jurusan ini tersedia.'
-                ], 500);
+            // 2. PAKSA GENERATE jika soal belum ada
+            $soal_count = SoalAcak::where('id_siswa', $id_siswa)->where('tahap', $ujian->tahap)->count();
+            if($soal_count == 0) {
+                $this->generate_soal($siswa, $ujian->tahap);
+                
+                // Cek lagi setelah generate, jika masih 0 berarti database soal kamu kosong untuk kategori tersebut
+                $recheck = SoalAcak::where('id_siswa', $id_siswa)->where('tahap', $ujian->tahap)->count();
+                if($recheck == 0) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Gagal generate soal. Pastikan bank soal untuk kategori jurusan ini tersedia.',
+                        'tahap' => $ujian->tahap
+                    ], 500);
+                }
             }
-        }
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Ujian dimulai',
-            'tahap' => $ujian->tahap
-        ], 200);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Ujian dimulai',
+                'tahap' => $ujian->tahap
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
+            ], 500);
+        }
+        
     }
 
     public function halaman_soal(Request $request, $id_siswa)
     {
         $siswa = Account::findOrFail($id_siswa);
-
         $ujian = Ujian::where('id_siswa', $id_siswa)->first();
 
         if (!$ujian) {
@@ -79,7 +89,6 @@ class ExamController extends Controller
         */
 
         $this->cek_tahap($siswa, $ujian);
-
         $ujian->refresh();
 
         /*
@@ -87,7 +96,6 @@ class ExamController extends Controller
         | CEK STATUS SELESAI
         |--------------------------------------------------------------------------
         */
-
         if ($ujian->status == 'selesai') {
 
             return response()->json([
@@ -100,13 +108,9 @@ class ExamController extends Controller
         | HITUNG SISA WAKTU
         |--------------------------------------------------------------------------
         */
-
         $waktu_mulai = Carbon::parse($ujian->mulai_at);
-
         $detik_berlalu = now()->timestamp - $waktu_mulai->timestamp;
-
         $sisa_waktu = self::DURASI_UJIAN_DETIK - $detik_berlalu;
-
         if ($sisa_waktu <= 0) {
 
             $ujian->update([
@@ -125,14 +129,21 @@ class ExamController extends Controller
         | JIKA MASIH JEDA
         |--------------------------------------------------------------------------
         */
-
-        if ($ujian->tahap == 'jeda') {
+        if ($ujian->tahap == 'jeda_umum') {
 
             return response()->json([
                 'status' => 'transisi',
-                'next_tahap' => 'jeda'
+                'next_tahap' => 'kejuruan_pertama'
             ]);
         }
+
+        // if ($ujian->tahap == 'jeda_kejuruan') {
+
+        //     return response()->json([
+        //         'status' => 'transisi',
+        //         'next_tahap' => 'kejuruan_kedua'
+        //     ]);
+        // }
 
         /*
         |--------------------------------------------------------------------------
@@ -168,19 +179,19 @@ class ExamController extends Controller
         | JIKA SOAL HABIS
         |--------------------------------------------------------------------------
         */
-
         if (!$soal_acak) {
 
-            // jika kejuruan selesai
-            if ($ujian->tahap == 'kejuruan') {
+            // jika kejuruan kedua selesai
+            if ($ujian->tahap == 'kejuruan_kedua') {
 
                 $ujian->update([
                     'status' => 'selesai',
+                    'waktu_selesai_jurusan_kedua' => now(),
                     'selesai_at' => now()
                 ]);
 
                 return response()->json([
-                    'status' => 'selesai',
+                    'status' => 'selesai', //
                     'message' => 'Tes selesai'
                 ]);
             }
@@ -210,101 +221,6 @@ class ExamController extends Controller
             ]
         ]);
     }
-    // public function halaman_soal(Request $request, $id_siswa)
-    // {
-    //     $siswa = Account::findOrFail($id_siswa);
-    //     $ujian = Ujian::where('id_siswa', $id_siswa)->first();
-
-    //     if (!$ujian) return response()->json(['status' => 'error', 'message' => 'Ujian belum dimulai'], 404);
-        
-    //     // 1. JALANKAN CEK TAHAP DI AWAL
-    //     // Ini akan mengubah status 'jeda' -> 'kejuruan' jika waktu sudah > 60 detik
-    //     $this->cek_tahap($siswa, $ujian);
-        
-    //     // 2. REFRESH DATA UJIAN
-    //     // Penting! Agar variabel $ujian sinkron dengan perubahan status yang dilakukan di cek_tahap tadi
-    //     $ujian->refresh();
-
-    //     if ($ujian->status == 'selesai') return response()->json(['status' => 'selesai', 'result' => $this->hitung_skor($id_siswa)], 200);
-
-    //     // Hitung Sisa Waktu
-    //     $waktu_mulai = Carbon::parse($ujian->mulai_at);
-    //     $sekarang = now();
-    //     $detik_berlalu = $sekarang->timestamp - $waktu_mulai->timestamp;
-    //     $sisa_waktu = (int) (self::DURASI_UJIAN_DETIK - $detik_berlalu);
-
-    //     if ($sisa_waktu <= 0) {
-    //         $ujian->update(['status' => 'selesai', 'selesai_at' => now()]);
-    //         return response()->json(['status' => 'selesai', 'message' => 'Waktu habis'], 200);
-    //     }
-
-    //     // Logika Pengambilan Soal
-    //     $urutan_diminta = $request->query('urutan');
-
-    //     if ($urutan_diminta) {
-    //         $soal_acak = SoalAcak::with(['soal', 'jawaban_user' => function($q) use ($id_siswa) {
-    //             $q->where('id_siswa', $id_siswa);
-    //         }])
-    //         ->where('id_siswa', $id_siswa)
-    //         ->where('tahap', $ujian->tahap) // Ini akan otomatis mencari 'kejuruan' jika sudah berubah
-    //         ->where('urutan', $urutan_diminta)
-    //         ->first();
-    //     } else {
-    //         $id_soal_terjawab = Jawaban::where('id_siswa', $id_siswa)->pluck('id_soal');
-    //         $soal_acak = SoalAcak::with('soal')
-    //             ->where('id_siswa', $id_siswa)
-    //             ->where('tahap', $ujian->tahap)
-    //             ->whereNotIn('id_soal', $id_soal_terjawab)
-    //             ->orderBy('urutan')
-    //             ->first();
-    //     }
-
-    //     // 3. LOGIKA TRANSISI
-    //     if (!$soal_acak) {
-    //         // Jika status masih 'umum' tapi soal habis, panggil cek_tahap untuk masuk ke 'jeda'
-    //         if ($ujian->tahap == 'umum') {
-    //             $this->cek_tahap($siswa, $ujian);
-    //             return response()->json([
-    //                 'status' => 'transisi', 
-    //                 'next_tahap' => 'jeda', 
-    //                 'message' => 'Tahap umum selesai, masuk waktu jeda...'
-    //             ]);
-    //         }
-
-    //         // Jika status sudah 'jeda', kirim transisi agar React tampilkan timer jeda
-    //         if ($ujian->tahap == 'jeda') {
-    //             return response()->json([
-    //                 'status' => 'transisi', 
-    //                 'next_tahap' => 'jeda'
-    //             ]);
-    //         }
-
-    //         // Jika status masih kejuruan tapi soal habis, panggil cek_tahap untuk arahkan ke hasil
-    //         if ($ujian->tahap == 'kejuruan') {
-    //             $ujian->update([
-    //                 'status' => 'selesai', 
-    //                 'selesai_at' => now()
-    //             ]);
-    //             return response()->json([
-    //                 'status' => 'selesai',
-    //                 'message' => 'Anda sudah menyelesaikan TES !!!'
-    //             ]);
-    //         }
-
-    //         // Jika tahap sudah 'kejuruan' tapi soal tidak ada, berarti ada error saat generate
-    //         return response()->json(['status' => 'error', 'message' => 'Soal kejuruan tidak ditemukan']);
-    //     }
-
-    //     return response()->json([
-    //         'status' => 'success',
-    //         'data' => [
-    //             'soal' => $soal_acak,
-    //             'tahap' => $ujian->tahap,
-    //             'sisa_waktu' => $sisa_waktu,
-    //             'daftar_navigasi' => SoalAcak::where('id_siswa', $id_siswa)->where('tahap', $ujian->tahap)->select('urutan', 'id_soal')->get()
-    //         ]
-    //     ], 200);
-    // }
 
     private function cek_tahap($siswa, $ujian)
     {
@@ -313,47 +229,48 @@ class ExamController extends Controller
         | CEK PINDAH DARI UMUM -> JEDA
         |--------------------------------------------------------------------------
         */
-
         if ($ujian->tahap == 'umum') {
 
-            $id_soal_umum = SoalAcak::where('id_siswa', $siswa->id)
+            $soal_umum = SoalAcak::where('id_siswa', $siswa->id)
                 ->where('tahap', 'umum')
-                ->pluck('id_soal');
-
-            $total_soal_umum = $id_soal_umum->count();
-
-            $jumlah_jawab = Jawaban::where('id_siswa', $siswa->id)
-                ->whereIn('id_soal', $id_soal_umum)
+                // ->pluck('id_soal')
                 ->count();
 
+            // $total_soal_umum = $id_soal_umum->count();
+
+            // $jumlah_jawab = Jawaban::where('id_siswa', $siswa->id)
+            //     ->whereIn('id_soal', $id_soal_umum)
+            //     ->count();
+            $jumlah_jawab = Jawaban::where('id_siswa', $siswa->id)
+                ->where('tahap', 'umum')
+                ->distinct('id_soal')
+                ->count('id_soal');
+             
+            // Logger
             logger()->info([
-                'total_soal_umum' => $total_soal_umum,
+                'total_soal_umum' => $soal_umum,
                 'jumlah_jawab' => $jumlah_jawab,
             ]);
 
-            if (
-                $jumlah_jawab >= $total_soal_umum &&
-                $total_soal_umum > 0
-            ) {
+            if ($jumlah_jawab >= $soal_umum && $soal_umum > 0) {
 
                 $ujian->update([
-                    'tahap' => 'jeda',
+                    'tahap' => 'jeda_umum',
                     'waktu_selesai_umum' => now()
                 ]);
-
-                $ujian->refresh();
-
+                // $ujian->refresh();
                 logger()->info('PINDAH KE JEDA');
+                return;
             }
         }
 
         /*
         |--------------------------------------------------------------------------
-        | CEK PINDAH DARI JEDA -> KEJURUAN
+        | CEK PINDAH DARI JEDA -> KEJURUAN PERTAMA
         |--------------------------------------------------------------------------
         */
 
-        if ($ujian->tahap == 'jeda') {
+        if ($ujian->tahap == 'jeda_umum') {
 
             if (!$ujian->waktu_selesai_umum) {
                 return;
@@ -370,91 +287,101 @@ class ExamController extends Controller
             if ($detikLalu >= 60) {
 
                 $ujian->update([
-                    'tahap' => 'kejuruan'
+                    'tahap' => 'kejuruan_pertama' // Update ke kejuruan pertama
                 ]);
 
                 $ujian->refresh();
 
                 // generate soal kejuruan jika belum ada
                 $cekSoal = SoalAcak::where('id_siswa', $siswa->id)
-                    ->where('tahap', 'kejuruan')
+                    ->where('tahap', 'kejuruan_pertama')
                     ->count();
 
                 if ($cekSoal == 0) {
-                    $this->generate_soal($siswa, 'kejuruan');
+                    $this->generate_soal($siswa, 'kejuruan_pertama');
                 }
 
-                logger()->info('PINDAH KE KEJURUAN');
+                logger()->info('PINDAH KE KEJURUAN PERTAMA');
+                return;
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | CEK PINDAH DARI KEJURUAN PERTAMA -> JEDA
+        |--------------------------------------------------------------------------
+        */
+        if ($ujian->tahap == 'kejuruan_pertama') {
+
+            $soal_kejuruan_pertama = SoalAcak::where('id_siswa', $siswa->id)
+                ->where('tahap', 'kejuruan_pertama')
+                // ->pluck('id_soal');
+                ->count();
+
+            $jumlah_jawab = Jawaban::where('id_siswa', $siswa->id)
+                ->where('tahap', 'kejuruan_pertama')
+                ->distinct('id_soal')
+                ->count('id_soal');
+
+            logger()->info([
+                'total_soal_kejuruan_pertama' => $soal_kejuruan_pertama,
+                'jumlah_jawab' => $jumlah_jawab,
+            ]);
+
+            if ($jumlah_jawab >= $soal_kejuruan_pertama && $soal_kejuruan_pertama > 0) {
+
+                $ujian->update([
+                    'tahap' => 'jeda_kejuruan',
+                    'waktu_selesai_jurusan_pertama' => now()
+                ]);
+
+                $ujian->refresh();
+                logger()->info('PINDAH KE JEDA');
+                return;
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | CEK PINDAH DARI JEDA -> KEJURUAN KEDUA
+        |--------------------------------------------------------------------------
+        */
+        if ($ujian->tahap == 'jeda_kejuruan') {
+
+            if (!$ujian->waktu_selesai_jurusan_pertama) {
+                return;
+            }
+
+            $detikLalu = Carbon::parse(
+                $ujian->waktu_selesai_jurusan_pertama
+            )->diffInSeconds(now());
+
+            logger()->info([
+                'detik_jeda' => $detikLalu
+            ]);
+
+            if ($detikLalu >= 60) {
+
+                $ujian->update([
+                    'tahap' => 'kejuruan_kedua' // Update ke kejuruan kedua
+                ]);
+
+                $ujian->refresh();
+
+                // generate soal kejuruan jika belum ada
+                $cekSoal = SoalAcak::where('id_siswa', $siswa->id)
+                    ->where('tahap', 'kejuruan_kedua')
+                    ->count();
+
+                if ($cekSoal == 0) {
+                    $this->generate_soal($siswa, 'kejuruan_kedua');
+                }
+
+                logger()->info('PINDAH KE KEJURUAN KEDUA');
+                return;
             }
         }
     }
-
-    // private function cek_tahap($siswa, $ujian)
-    // {
-    //     if($ujian->tahap == 'umum') {
-    //         $id_soal_umum = SoalAcak::where('id_siswa', $siswa->id)
-    //             ->where('tahap', 'umum')
-    //             ->pluck('id_soal');
-
-    //         $total_soal_umum = $id_soal_umum->count();
-
-    //         $jumlah_jawab = Jawaban::where('id_siswa', $siswa->id)
-    //             ->whereIn('id_soal', $id_soal_umum)
-    //             ->count();
-
-    //         if($jumlah_jawab >= $total_soal_umum && $total_soal_umum > 0) {
-    //             // Update waktu selesai tahap umum
-    //             $ujian->update([
-    //                 'tahap' => 'jeda',
-    //                 'waktu_selesai_umum' => now()
-    //             ]);
-
-    //             $ujian->refresh();
-    //         }
-
-    //         logger()->info([
-    //             'total_soal_umum' => $total_soal_umum,
-    //             'jumlah_jawab' => $jumlah_jawab,
-    //         ]);
-    //     }
-
-    //     if ($ujian->tahap == 'jeda') {
-            
-    //         if (!$ujian->waktu_selesai_umum) return;
-
-    //         $selesai = Carbon::parse($ujian->waktu_selesai_umum);
-    //         $sekarang = now();
-
-    //         // Gunakan diffInSeconds tanpa parameter kedua atau pastikan urutannya benar
-    //         $detikLalu = $selesai->diffInSeconds($sekarang);
-
-    //         if ($detikLalu >= 60) {
-    //             // 1. Update ke database
-    //             $ujian->update([
-    //                 'tahap' => 'kejuruan'
-    //             ]);
-
-    //             // 2. REFRESH instance agar $ujian->tahap berubah menjadi 'kejuruan' di baris kode selanjutnya
-    //             $ujian->refresh();
-
-    //             // 3. Cek dan Generate Soal
-    //             $cekSoal = SoalAcak::where('id_siswa', $siswa->id)
-    //                             ->where('tahap', 'kejuruan')
-    //                             ->count();
-
-    //             if ($cekSoal == 0) {
-    //                 $this->generate_soal($siswa, 'kejuruan');
-    //             }
-                
-    //             logger()->info('Transisi Jeda ke Kejuruan Sukses', ['id_siswa' => $siswa->id]);
-    //         }
-    //     }
-
-    //     logger()->info([
-    //         'tahap' => $ujian->tahap,
-    //         'waktu_selesai_umum' => $ujian->waktu_selesai_umum,
-    //     ]);
-    // }
 
     private function generate_soal($siswa, $tahap)
     {
@@ -465,6 +392,7 @@ class ExamController extends Controller
             return;
         }
 
+        // Soal dengan
         $soal = Soal::whereIn('kategori', $kategori)->inRandomOrder()->get();
 
         if ($soal->isEmpty()) {
@@ -484,31 +412,46 @@ class ExamController extends Controller
 
     private function get_kategori_soal($siswa, $tahap)
     {
-        $jurusan = strtoupper($siswa->jurusan);
+        $jurusan_1 = strtoupper($siswa->jurusan_pertama);
+        $jurusan_2 = strtoupper($siswa->jurusan_kedua);
         // Debug: 
-        \Log::info("Jurusan Siswa: " . $jurusan);
-        $kategoriMap = [
-            'umum' => [
-                'PPLG' => ['mtk_umum', 'bindo_teknik', 'binggris_teknik'],
-                'TJKT' => ['mtk_umum', 'bindo_teknik', 'binggris_teknik'],
-                'DKV'  => ['mtk_umum', 'bindo_seni', 'binggris_seni'],
-                'BP'   => ['mtk_umum', 'bindo_seni', 'binggris_seni'],
-                'AN'   => ['mtk_umum', 'bindo_seni', 'binggris_seni'],
-                'MP'   => ['mtk_umum', 'bindo_manajemen', 'binggris_manajemen'],
-                'AK'   => ['mtk_umum', 'bindo_manajemen', 'binggris_manajemen'],
-            ],
-            'kejuruan' => [
-                'PPLG' => ['rpl_tkj'],
-                'TJKT' => ['rpl_tkj'],
-                'DKV'  => ['an_dkv_bp'],
-                'BP'   => ['an_dkv_bp'],
-                'AN'   => ['an_dkv_bp'],
-                'MP'   => ['mp_ak'],
-                'AK'   => ['mp_ak'],
-            ]
-        ];
+        \Log::info("Jurusan Siswa: " . $jurusan_1 . " dan " . $jurusan_2 );
+        switch ($tahap) {
+            case 'umum':
+                return match ($jurusan_1) {
+                    'PPLG', 'TJKT' => ['mtk_umum', 'bindo_teknik', 'binggris_teknik'],
+                    'DKV', 'AN', 'BP' => ['mtk_umum', 'bindo_seni', 'binggris_seni'],
+                    'MP', 'AK' => ['mtk_umum', 'bindo_manajemen', 'binggris_manajemen'],
 
-        return $kategoriMap[$tahap][$jurusan] ?? [];
+                    default => []
+                };
+
+            case 'kejuruan_pertama':
+                return match ($jurusan_1) {
+                    'PPLG' => ['jurusan_rpl'],
+                    'TJKT' => ['jurusan_tjkt'],
+                    'DKV'  => ['jurusan_dkv'],
+                    'BP'   => ['jurusan_bp'],
+                    'AN'   => ['jurusan_an'],
+                    'MP'   => ['jurusan_mp'],
+                    'AK'   => ['jurusan_ak'],
+                    default => []
+                };
+            
+            case 'kejuruan_kedua':
+                return match($jurusan_2) {
+                    'PPLG' => ['jurusan_rpl'],
+                    'TJKT' => ['jurusan_tjkt'],
+                    'DKV'  => ['jurusan_dkv'],
+                    'BP'   => ['jurusan_bp'],
+                    'AN'   => ['jurusan_an'],
+                    'MP'   => ['jurusan_mp'],
+                    'AK'   => ['jurusan_ak'],
+                    default => []
+                };
+        }
+
+        return [];
     }
 
     public function simpan_jawaban(Request $request)
@@ -548,6 +491,10 @@ class ExamController extends Controller
             ['id_siswa' => $request->id_siswa, 'id_soal' => $request->id_soal],
             ['jawaban' => $request->jawaban, 'urutan' => $request->urutan, 'tahap' => $ujian->tahap]
         );
+
+        $siswa = Account::findOrFail($request->id_siswa);
+        $this->cek_tahap($siswa, $ujian);
+        $ujian->refresh();
 
         return response()->json([
             'status' => true
@@ -613,29 +560,41 @@ class ExamController extends Controller
             // ===============================
             // CEK SELESAI KEJURUAN
             // ===============================
-            if ($ujian->tahap == 'kejuruan') {
+            if ($ujian->tahap == 'kejuruan_kedua') {
 
-                $totalKejuruan = SoalAcak::where('id_siswa', $siswa->id)
-                    ->where('tahap', 'kejuruan')
+                $totalKejuruanPertama = SoalAcak::where('id_siswa', $siswa->id)
+                    ->where('tahap', 'kejuruan_pertama')
                     ->count();
 
-                $jawabanKejuruan = Jawaban::where('id_siswa', $siswa->id)
-                    ->where('tahap', 'kejuruan')
+                $jawabanKejuruanPertama = Jawaban::where('id_siswa', $siswa->id)
+                    ->where('tahap', 'kejuruan_pertama')
+                    ->distinct('id_soal')
+                    ->count('id_soal');
+
+                $totalKejuruanKedua = SoalAcak::where('id_siswa', $siswa->id)
+                    ->where('tahap', 'kejuruan_kedua')
+                    ->count();
+
+                $jawabanKejuruanKedua = Jawaban::where('id_siswa', $siswa->id)
+                    ->where('tahap', 'kejuruan_kedua')
                     ->distinct('id_soal')
                     ->count('id_soal');
 
                 logger()->info([
-                    'totalKejuruan' => $totalKejuruan,
-                    'jawabanKejuruan' => $jawabanKejuruan
+                    'totalKejuruanPertama' => $totalKejuruanPertama,
+                    'jawabanKejuruanPertama' => $jawabanKejuruanPertama,
+                    'totalKejuruanKedua' => $totalKejuruanKedua,
+                    'jawabanKejuruanKedua' => $jawabanKejuruanKedua
                 ]);
 
                 // ===================================
                 // JIKA SUDAH SELESAI SEMUA
                 // ===================================
-                if ($jawabanKejuruan >= $totalKejuruan && $totalKejuruan > 0) {
+                if ($jawabanKejuruanKedua >= $totalKejuruanKedua && $totalKejuruanKedua > 0) {
 
                     $ujian->update([
                         'status' => 'selesai',
+                        'waktu_selesai_jurusan_kedua' => now(),
                         'selesai_at' => now()
                     ]);
 
@@ -658,11 +617,19 @@ class ExamController extends Controller
             // ===============================
             // RESPONSE JEDA
             // ===============================
-            if ($ujian->tahap == 'jeda') {
+            if ($ujian->tahap == 'jeda_umum') {
 
                 return response()->json([
-                    'status' => 'jeda',
+                    'status' => 'jeda_umum',
                     'message' => 'Tahap umum selesai'
+                ]);
+            }
+
+            if ($ujian->tahap == 'jeda_kejuruan') {
+
+                return response()->json([
+                    'status' => 'jeda_kejuruan',
+                    'message' => 'Masuk jeda kejuruan'
                 ]);
             }
 
@@ -672,17 +639,17 @@ class ExamController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Jawaban berhasil disimpan'
-            ]);
+            ], 200);
 
         } catch (\Exception $e) {
 
             DB::rollBack();
-
             logger()->error($e->getMessage());
-
             return response()->json([
                 'status' => 'error',
-                'message' => 'Gagal menyimpan jawaban'
+                'message' => 'Gagal menyimpan jawaban',
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
             ], 500);
         }
     }

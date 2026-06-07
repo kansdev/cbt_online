@@ -43,6 +43,8 @@
         </div>
     </div>
 
+    
+
     <script>
         function reset(id_siswa = "{{ $soal->id_siswa ?? request()->route('id') }}") {
             fetch('/ujian/reset/' + id_siswa, {

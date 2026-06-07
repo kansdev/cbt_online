@@ -11,10 +11,9 @@ class Account extends Model
         'nama',
         'nisn',
         'jenis_kelamin',
-        'jurusan',
-        'kategori',
+        'jurusan_pertama',
+        'jurusan_kedua',
         'jenis_umum',
-        'jenis_kejuruan',
         'tanggal_kelahiran',
         'id_gelombang',
         'status'

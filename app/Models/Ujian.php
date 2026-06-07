@@ -13,12 +13,16 @@ class Ujian extends Model
         'tahap',
         'mulai_at',
         'waktu_selesai_umum',
+        'waktu_selesai_jurusan_pertama',
+        'waktu_selesai_jurusan_kedua',
         'selesai_at'
     ];
 
     protected $casts = [
         'mulai_at' => 'datetime',
         'waktu_selesai_umum' => 'datetime',
+        'waktu_selesai_jurusan_pertama' => 'datetime',
+        'waktu_selesai_jurusan_kedua' => 'datetime',
         'selesai_at' => 'datetime',
     ];
 

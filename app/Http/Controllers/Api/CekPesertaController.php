@@ -52,7 +52,7 @@ class CekPesertaController extends Controller
             'message' => 'Akun anda belum aktif. Hubungi Operator'
         ], 400);
 
-        $soal = Soal::whereIn('jenis_soal', ['umum', $siswa->jenis_umum, $siswa->jenis_kejuruan])->count();
+        $soal = Soal::whereIn('jenis_soal', ['umum', $siswa->jenis_umum, $siswa->jurusan_pertama, $siswa->jurusan_kedua])->count();
         $datetime = Carbon::now()->format('d F Y, H:i') . 'WIB';
 
         return response()->json([
@@ -63,7 +63,8 @@ class CekPesertaController extends Controller
                 'nisn' => $siswa->nisn,
                 'gelombang' => $siswa->id_gelombang,
                 'jenis_umum' => $siswa->jenis_umum,
-                'jenis_kejuruan' => $siswa->jenis_kejuruan,
+                'jurusan_pertama' => $siswa->jurusan_pertama,
+                'jurusan_kedua' => $siswa->jurusan_kedua,
                 'status' => $siswa->status,
                 'jumlah_soal' => $soal,
                 'datetime' => $datetime,

@@ -16,8 +16,30 @@ class AccountSeeder extends Seeder
     public function run(): void
     {
         $accounts = [
-            ['nomor_registrasi' => '955794', 'nama' => 'Muhammad Rafly Wadson', 'nisn' => '0118059754', 'jurusan' => 'TJKT', 'kategori' => 'rpl_tkj', 'jenis_umum' => 'umum_an_rpl_tkj', 'jenis_kejuruan' => 'kejuruan_rpl_tkj', 'jenis_kelamin' => 'Laki - Laki', 'id_gelombang' => '3', 'status' => 'aktif'],
-            ['nomor_registrasi' => '950940', 'nama' => 'Jasmine Kyla Rendyta', 'nisn' => '0106818889', 'jurusan' => 'AK', 'kategori' => 'mp_ak', 'jenis_umum' => 'umum_mp_ak', 'jenis_kejuruan' => 'kejuruan_mp_ak', 'jenis_kelamin' => 'Laki - Laki', 'id_gelombang' => '3', 'status' => 'aktif'],
+            [
+                'nomor_registrasi' => '955794', 
+                'nama' => 'Muhammad Rafly Wadson', 
+                'nisn' => '0118059754', 
+                'jurusan_pertama' => 'TJKT', 
+                'jurusan_kedua' => 'PPLG', 
+                'jenis_umum' => 'umum_an_rpl_tkj', 
+                'tanggal_lahir' => '07/06/2026',
+                'jenis_kelamin' => 'Laki - Laki', 
+                'id_gelombang' => '4', 
+                'status' => 'aktif'
+            ],     
+            [
+                'nomor_registrasi' => '123456', 
+                'nama' => 'Desi Permatasari', 
+                'nisn' => '0123456789', 
+                'jurusan_pertama' => 'MP', 
+                'jurusan_kedua' => 'AK', 
+                'jenis_umum' => 'umum_mp_ak',
+                'tanggal_lahir' => '07/06/2026',
+                'jenis_kelamin' => 'Perempuan', 
+                'id_gelombang' => '4', 
+                'status' => 'aktif'
+            ],        
         ];
         foreach ($accounts as $account) {
             Account::create($account);

@@ -16,9 +16,11 @@ return new class extends Migration
             $table->foreignId('id_siswa')->constrained('accounts')->cascadeOnDelete();
             $table->string('nisn')->index();
             $table->enum('status', ['belum', 'mulai', 'selesai'])->default('belum');
-            $table->enum('tahap', ['umum', 'jeda', 'kejuruan'])->default('umum');
+            $table->enum('tahap', ['umum', 'jeda_umum', 'jeda_kejuruan','kejuruan_pertama', 'kejuruan_kedua'])->default('umum');
             $table->timestamp('mulai_at')->nullable();
             $table->timestamp('waktu_selesai_umum')->nullable();
+            $table->timestamp('waktu_selesai_jurusan_pertama')->nullable();
+            $table->timestamp('waktu_selesai_jurusan_kedua')->nullable();    
             $table->timestamp('selesai_at')->nullable();
             $table->timestamps();
         });
