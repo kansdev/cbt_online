@@ -26,8 +26,8 @@
                             <th>No Registrasi</th>
                             <th>NIS/NISN</th>
                             <th>Nama</th>
-                            <th>Jurusan</th>
-                            <th>Kategori</th>
+                            <th>Jurusan Pertama</th>
+                            <th>Jurusan Kedua</th>
                             <th>Gelombang</th>
                             <th>Status</th>
                         </tr>
@@ -39,8 +39,8 @@
                                 <td>{{ $p->nomor_registrasi }}</td>
                                 <td>{{ $p->nisn }}</td>
                                 <td>{{ $p->nama }}</td>
-                                <td>{{ $p->jurusan }}</td>
-                                <td>{{ $p->kategori }}</td>
+                                <td>{{ $p->jurusan_pertama }}</td>
+                                <td>{{ $p->jurusan_kedua }}</td>
                                 <td>{{ $p->id_gelombang }}</td>
                                 <td>
                                     @if ($p->status == 'nonaktif')
