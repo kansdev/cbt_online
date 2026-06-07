@@ -21,7 +21,6 @@
                             <th>No</th>
                             <th>NISN</th>
                             <th>Nama</th>
-                            <th>Jurusan</th>
                             <th>Status</th>
                             <th>Aksi</th>
                         </tr>
@@ -32,7 +31,6 @@
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $p->ujian->nisn }}</td>
                                 <td>{{ $p->nama }}</td>
-                                <td>{{ $p->jurusan }}</td>
                                 <td>{{ ucfirst($p->ujian->status) }}</td>
                                 <td>
                                     @if ($p->ujian->status == 'selesai')

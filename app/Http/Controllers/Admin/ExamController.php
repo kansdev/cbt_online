@@ -137,6 +137,24 @@ class ExamController extends Controller
         return view('admin.pages.riwayat', compact('riwayat'));
     }
 
+    function importSoal(Request $request)
+    {
+        try {
+            $request->validate([
+                'file' => 'required|mimes:xlsx,xls,csv',
+            ]);
+
+            $file = $request->file('file');
+            $import = new SoalImport;
+            Excel::import($import, $file);
+
+            return redirect()->back()->with('success', 'Soal berhasil diimpor!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('failed', 'Soal gagal diimpor! : ' . $e->getMessage());
+        }
+
+    }
+
     // Unduh hasil jawaban
     public function unduh_hasil_jawaban()
     {

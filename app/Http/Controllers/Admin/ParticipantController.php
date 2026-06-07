@@ -170,9 +170,9 @@ class ParticipantController extends Controller
             $import = new PesertaImport;
             Excel::import($import, $file);
 
-            return redirect()->back()->with('success', 'Soal berhasil diimpor!');
+            return redirect()->back()->with('success', 'Peserta berhasil diimpor!');
         } catch (\Exception $e) {
-            return redirect()->back()->with('failed', 'Soal gagal diimpor! : ' . $e->getMessage());
+            return redirect()->back()->with('failed', 'Peserta gagal diimpor! : ' . $e->getMessage());
         }
 
     }
