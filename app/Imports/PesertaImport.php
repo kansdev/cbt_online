@@ -17,10 +17,9 @@ class PesertaImport implements ToModel, WithHeadingRow
             'nama' => $row['nama'],
             'nisn' => $row['nisn'],
             'jenis_kelamin' => $row['jenis_kelamin'],
-            'jurusan' => $row['jurusan'],
-            'kategori' => $row['kategori'],
+            'jurusan_pertama' => $row['jurusan_pertama'],
+            'jurusan_kedua' => $row['jurusan_kedua'],
             'jenis_umum' => $row['jenis_umum'],
-            'jenis_kejuruan' => $row['jenis_kejuruan'],
             'tanggal_lahir' => $row['tanggal_lahir'],
             'id_gelombang' => $row['id_gelombang'],
             'status' => $row['status']
