@@ -5,7 +5,7 @@ return [
 
     'allowed_methods' => ['*'], // Izinkan semua metode (POST, GET, dll)
 
-    'allowed_origins' => ['http://localhost:5174'], // IZINKAN URL REACT ANDA
+    'allowed_origins' => ['https://cbt.kansdev.my.id'], // IZINKAN URL REACT ANDA
 
     'allowed_origins_patterns' => [],
 
