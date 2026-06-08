@@ -20,7 +20,7 @@ class ParticipantController extends Controller
     public function peserta()
     {
         // Ambil data peserta dengan pagination 20 data per halaman dan urutkan berdasarkan nama
-        $peserta = Account::orderBy('nama', 'asc')->paginate(20);
+        $peserta = Account::orderBy('nama', 'asc')->paginate(100);
 
         // Tampilkan halaman peserta dengan data peserta
         return view('admin.pages.peserta', compact('peserta'));
@@ -29,7 +29,7 @@ class ParticipantController extends Controller
     public function peserta_aktif()
     {
         // Ambil data peserta yang aktif dengan pagination 20 data per halaman dan urutkan
-        $peserta_aktif = Account::orderBy('nama', 'asc')->paginate(20);
+        $peserta_aktif = Account::orderBy('nama', 'asc')->paginate(100);
         
         // Tampilkan halaman peserta aktif dengan data peserta aktif
         return view('admin.pages.aktif_peserta', compact('peserta_aktif'));
