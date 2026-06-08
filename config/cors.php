@@ -5,7 +5,7 @@ return [
 
     'allowed_methods' => ['*'], // Izinkan semua metode (POST, GET, dll)
 
-    'allowed_origins' => ['https://test.kansdev.my.id'], // IZINKAN URL REACT ANDA
+    'allowed_origins' => ['https://test.kansdev.my.id', 'https://wawancara.kansdev.my.id'], // IZINKAN URL REACT ANDA
 
     'allowed_origins_patterns' => [],
 
