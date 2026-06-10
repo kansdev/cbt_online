@@ -16,6 +16,10 @@ class Wawancara extends Model
         'kesimpulan'
     ];
 
+    public function account() {
+        return $this->belongsTo(Account::class);
+    }
+
     public function pewawancara()
     {
         return $this->belongsTo(Pewawancara::class);

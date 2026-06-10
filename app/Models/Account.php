@@ -37,4 +37,8 @@ class Account extends Model
     {
         return $this->hasMany(Jawaban::class, 'id_siswa', 'id');
     }
+
+    public function wawancara() {        
+        return $this->hasMany(Wawancara::class);
+    }
 }

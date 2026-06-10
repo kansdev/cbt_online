@@ -18,4 +18,6 @@ Route::post('/ujian/simpan-batch', [ExamController::class, 'simpan_batch']);
 Route::post('/wawancara/login/{nip}', [WawancaraController::class, 'login_pewawancara']);
 Route::get('/wawancara/{id}', [WawancaraController::class, 'show']);
 Route::post('/wawancara/simpan', [WawancaraController::class, 'simpan']);
+Route::post('/wawancara/cek/{nomor_pendaftaran}', [WawancaraController::class, 'cek_if_exists']);
+Route::get('/wawancara/hasil/pewawancara/{id}', [WawancaraController::class, 'hasil_wawancara']);
 

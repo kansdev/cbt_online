@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Exception;
 
+use App\Models\Account;
 use App\Models\Pewawancara;
 use App\Models\Wawancara;
 use App\Models\WawancaraDetail;
@@ -83,5 +84,72 @@ class WawancaraController extends Controller
             'status' => 'success',
             'data' => $wawancara
         ]);
+    }
+
+    public function cek_if_exists($nomor_pendaftaran) {
+        try {
+            $hasil = Wawancara::where('nomor_pendaftaran', $nomor_pendaftaran)->exists();
+            if ($hasil) {
+                # code...
+                return response()->json([
+                    'status' => 'sudah_interview',
+                    'message' => 'Peserta sudah melakukan wawancara',
+                    'data' => $hasil
+                ]);
+            }
+            return response()->json([
+                'status' => 'belum_interview',
+                'message' => 'Peserta belum melakukan wawancara'
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function hasil_wawancara($pewawancara_id)
+    {
+        try {
+
+            $data = Wawancara::select(
+                'wawancara.id',
+                'wawancara.nomor_pendaftaran',
+                'wawancara.catatan',
+                'wawancara.kesimpulan',
+                'wawancara.created_at',
+                'accounts.nama',
+                'accounts.jurusan_pertama',
+                'accounts.jurusan_kedua'
+            )
+            ->join(
+                'accounts',
+                'accounts.nomor_registrasi',
+                '=',
+                'wawancara.nomor_pendaftaran'
+            )
+            ->where(
+                'wawancara.pewawancara_id',
+                $pewawancara_id
+            )
+            ->latest()
+            ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $data
+            ]);
+            
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+                'line' => $e->getLine()
+            ], 500);
+
+        }
     }
 }
