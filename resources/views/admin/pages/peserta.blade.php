@@ -85,8 +85,8 @@
                             <input type="date" class="form-control" id="tanggal_lahir" name="tanggal_lahir" required>
                         </div>
                         <div class="mb-3">
-                            <label for="jurusan" class="form-label">Jurusan</label>
-                            <select class="form-control" name="jurusan" id="jurusan">
+                            <label for="jurusan_pertama" class="form-label">Jurusan</label>
+                            <select class="form-control" name="jurusan_pertama" id="jurusan_pertama">
                                 <option>-- Pilih --</option>
                                 <option value="MP">Manajemen Perkantoran</option>
                                 <option value="AK">Akuntansi</option>
@@ -98,16 +98,30 @@
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="kategori" class="form-label">Kategori</label>
-                            <input type="text" class="form-control" id="kategori" name="kategori" readonly required>
+                            <label for="jurusan_kedua" class="form-label">Jurusan</label>
+                            <select class="form-control" name="jurusan_kedua" id="jurusan_kedua">
+                                <option>-- Pilih --</option>
+                                <option value="MP">Manajemen Perkantoran</option>
+                                <option value="AK">Akuntansi</option>
+                                <option value="AN">Animasi</option>
+                                <option value="TJKT">Teknik Jaringan Komputer & Telekomunikasi</option>
+                                <option value="DKV">Desain Komunikasi Visual</option>
+                                <option value="BP">Broadcasting & Perfilman</option>
+                                <option value="PPLG">Pengembangan Perangkat Lunak & Gim</option>
+                            </select>
                         </div>
                         <div class="mb-3">
-                            <label for="jenis_umum" class="form-label">Kode Soal Umum</label>
-                            <input type="text" class="form-control" id="jenis_umum" name="jenis_umum" readonly required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="jenis_kejuruan" class="form-label">Kode Soal Kejuruan</label>
-                            <input type="text" class="form-control" id="jenis_kejuruan" name="jenis_kejuruan" readonly required>
+                            <label for="jenis_umum" class="form-label">Jenis Soal Umum</label>
+                            <select class="form-control" name="jurusan_kedua" id="jurusan_kedua">
+                                <option>-- Pilih --</option>
+                                <option value="umum_mp_ak">Manajemen Perkantoran</option>
+                                <option value="umum_mp_ak">Akuntansi</option>
+                                <option value="umum_an_dkv_bp">Animasi</option>
+                                <option value="umum_rpl_tjkt">Teknik Jaringan Komputer & Telekomunikasi</option>
+                                <option value="umum_an_dkv_bp">Desain Komunikasi Visual</option>
+                                <option value="umum_an_dkv_bp">Broadcasting & Perfilman</option>
+                                <option value="umum_rpl_tjkt">Pengembangan Perangkat Lunak & Gim</option>
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label for="jenis_kelamin" class="form-label">Jenis Kelamin</label>
