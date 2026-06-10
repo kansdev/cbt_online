@@ -112,7 +112,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="jenis_umum" class="form-label">Jenis Soal Umum</label>
-                            <select class="form-control" name="jurusan_kedua" id="jurusan_kedua">
+                            <select class="form-control" name="jenis_umum" id="jenis_umum">
                                 <option>-- Pilih --</option>
                                 <option value="umum_mp_ak">Manajemen Perkantoran</option>
                                 <option value="umum_mp_ak">Akuntansi</option>
