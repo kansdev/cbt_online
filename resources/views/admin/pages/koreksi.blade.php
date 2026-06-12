@@ -32,8 +32,8 @@
                             <th rowspan="2" class="align-middle">No</th>
                             <th rowspan="2" class="align-middle">Nama</th>
                             <th colspan="4" class="table-primary">Umum ({{ $detail_jawaban->first()['soal_umum'] ?? 0 }})</th>
-                            <th colspan="4" class="table-info">Kejuruan Pertama({{ $detail_jawaban->first()['soal_jurusan_pertama'] ?? 0 }})</th>
-                            <th colspan="4" class="table-info">Kejuruan Kedua({{ $detail_jawaban->first()['soal_jurusan_kedua'] ?? 0 }})</th>
+                            <th colspan="4" class="table-info">Kejuruan Pertama({{ $detail_jawaban->first()['soal_kejuruan_pertama'] ?? 0 }})</th>
+                            <th colspan="4" class="table-info">Kejuruan Kedua({{ $detail_jawaban->first()['soal_kejuruan_kedua'] ?? 0 }})</th>
                             <th rowspan="2" class="align-middle">Total Jawaban Benar</th>
                             <th rowspan="2" class="align-middle">Nilai</th>
                             <th rowspan="2" class="align-middle">Aksi</th>
