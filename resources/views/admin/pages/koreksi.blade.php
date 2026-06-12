@@ -62,7 +62,7 @@
                                 <td class="text-center text-danger">{{ $d['umum']['salah'] }}</td>
                                 <td class="text-center text-danger">{{ $d['skor_umum']}}</td>
                                 <td class="text-center">
-                                    @if ($d['skor_umum'] > 70)
+                                    @if ($d['skor_umum'] > 60)
                                         <span class="badge text-bg-success">PASSED</span>
                                     @else
                                         <span class="badge text-bg-danger">FAILED</span>
@@ -72,7 +72,7 @@
                                 <td class="text-center text-danger">{{ $d['jurusan_pertama']['salah'] }}</td>
                                 <td class="text-center text-danger">{{ $d['skor_jurusan_pertama']}}</td>
                                 <td class="text-center text-danger">
-                                    @if ($d['skor_jurusan_pertama'] > 70)
+                                    @if ($d['skor_jurusan_pertama'] > 60)
                                         <span class="badge text-bg-success">PASSED</span>
                                     @else
                                         <span class="badge text-bg-danger">FAILED</span>
@@ -82,7 +82,7 @@
                                 <td class="text-center text-danger">{{ $d['jurusan_kedua']['salah'] }}</td>
                                 <td class="text-center text-danger">{{ $d['skor_jurusan_kedua']}}</td>
                                 <td class="text-center text-danger">
-                                    @if ($d['skor_jurusan_kedua'] > 70)
+                                    @if ($d['skor_jurusan_kedua'] > 60)
                                         <span class="badge text-bg-success">PASSED</span>
                                     @else
                                         <span class="badge text-bg-danger">FAILED</span>
@@ -90,7 +90,7 @@
                                 </td>
                                 <td class="text-center fw-bold">{{ $d['total_benar'] }} / {{  $d['total_soal'] }}</td>
                                 <td class="text-center">
-                                    <span class="badge {{ $d['nilai'] >= 70 ? 'bg-success' : 'bg-warning text-dark' }} fs-6">
+                                    <span class="badge {{ $d['nilai'] >= 60 ? 'bg-success' : 'bg-warning text-dark' }} fs-6">
                                         {{ $d['nilai'] }}
                                     </span>
                                 </td>

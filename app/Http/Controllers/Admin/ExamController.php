@@ -68,8 +68,8 @@ class ExamController extends Controller
 
             // Ambil total soal yang dialokasikan dari tabel SoalAcak secara dinamis
             $totalUmum = SoalAcak::where('id_siswa', $id_siswa)->where('tahap', 'umum')->count();
-            $totalJurusanPertama = SoalAcak::where('id_siswa', $id_siswa)->where('tahap', 'kejuruan_pertama')->count();
-            $totalJurusanKedua = SoalAcak::where('id_siswa', $id_siswa)->where('tahap', 'kejuruan_kedua')->count();
+            $totalJurusanPertama = SoalAcak::where('id_siswa', $id_siswa)->where('tahap', 'kejuruan_pertama')->distinct('id_soal')->count('id_soal');
+            $totalJurusanKedua = SoalAcak::where('id_siswa', $id_siswa)->where('tahap', 'kejuruan_kedua')->distinct('id_soal')->count('id_soal');
 
             $umum = ['benar' => 0, 'salah' => 0, 'total' => $totalUmum];
             $jurusanPertama = ['benar' => 0, 'salah' => 0, 'total' => $totalJurusanPertama];
