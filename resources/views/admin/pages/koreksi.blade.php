@@ -32,12 +32,17 @@
                             <th rowspan="2" class="align-middle">No</th>
                             <th rowspan="2" class="align-middle">Nama</th>
                             <th colspan="4" class="table-primary">Umum ({{ $detail_jawaban->first()['soal_umum'] ?? 0 }})</th>
-                            <th colspan="4" class="table-info">Kejuruan ({{ $detail_jawaban->first()['soal_kejuruan'] ?? 0 }})</th>
+                            <th colspan="4" class="table-info">Kejuruan Pertama({{ $detail_jawaban->first()['soal_jurusan_pertama'] ?? 0 }})</th>
+                            <th colspan="4" class="table-info">Kejuruan Kedua({{ $detail_jawaban->first()['soal_jurusan_kedua'] ?? 0 }})</th>
                             <th rowspan="2" class="align-middle">Total Jawaban Benar</th>
                             <th rowspan="2" class="align-middle">Nilai</th>
                             <th rowspan="2" class="align-middle">Aksi</th>
                         </tr>
                         <tr>
+                            <th>Benar</th>
+                            <th>Salah</th>
+                            <th>Skor</th>
+                            <th>Status</th>
                             <th>Benar</th>
                             <th>Salah</th>
                             <th>Skor</th>
@@ -63,11 +68,21 @@
                                         <span class="badge text-bg-danger">FAILED</span>
                                     @endif
                                 </td>
-                                <td class="text-center text-success fw-bold">{{ $d['kejuruan']['benar'] }}</td>
-                                <td class="text-center text-danger">{{ $d['kejuruan']['salah'] }}</td>
-                                <td class="text-center text-danger">{{ $d['skor_kejuruan']}}</td>
+                                <td class="text-center text-success fw-bold">{{ $d['jurusan_pertama']['benar'] }}</td>
+                                <td class="text-center text-danger">{{ $d['jurusan_pertama']['salah'] }}</td>
+                                <td class="text-center text-danger">{{ $d['skor_jurusan_pertama']}}</td>
                                 <td class="text-center text-danger">
-                                    @if ($d['skor_kejuruan'] > 70)
+                                    @if ($d['skor_jurusan_pertama'] > 70)
+                                        <span class="badge text-bg-success">PASSED</span>
+                                    @else
+                                        <span class="badge text-bg-danger">FAILED</span>
+                                    @endif
+                                </td>
+                                <td class="text-center text-success fw-bold">{{ $d['jurusan_kedua']['benar'] }}</td>
+                                <td class="text-center text-danger">{{ $d['jurusan_kedua']['salah'] }}</td>
+                                <td class="text-center text-danger">{{ $d['skor_jurusan_kedua']}}</td>
+                                <td class="text-center text-danger">
+                                    @if ($d['skor_jurusan_kedua'] > 70)
                                         <span class="badge text-bg-success">PASSED</span>
                                     @else
                                         <span class="badge text-bg-danger">FAILED</span>

@@ -68,10 +68,12 @@ class ExamController extends Controller
 
             // Ambil total soal yang dialokasikan dari tabel SoalAcak secara dinamis
             $totalUmum = SoalAcak::where('id_siswa', $id_siswa)->where('tahap', 'umum')->count();
-            $totalKejuruan = SoalAcak::where('id_siswa', $id_siswa)->where('tahap', 'kejuruan')->count();
+            $totalJurusanPertama = SoalAcak::where('id_siswa', $id_siswa)->where('tahap', 'kejuruan_pertama')->count();
+            $totalJurusanKedua = SoalAcak::where('id_siswa', $id_siswa)->where('tahap', 'kejuruan_kedua')->count();
 
             $umum = ['benar' => 0, 'salah' => 0, 'total' => $totalUmum];
-            $kejuruan = ['benar' => 0, 'salah' => 0, 'total' => $totalKejuruan];
+            $jurusanPertama = ['benar' => 0, 'salah' => 0, 'total' => $totalJurusanPertama];
+            $jurusanKedua = ['benar' => 0, 'salah' => 0, 'total' => $totalJurusanKedua];
 
             foreach($allJawabanSiswa as $item) {
                 // Gunakan optional() untuk menghindari error jika soal terhapus di DB
@@ -80,17 +82,20 @@ class ExamController extends Controller
 
                 if ($item->tahap === 'umum') {
                     $isBenar ? $umum['benar']++ : $umum['salah']++;
+                } else if($item->tahap === 'kejuruan_pertama') {
+                    $isBenar ? $jurusanPertama['benar']++ : $jurusanPertama['salah']++;
                 } else {
-                    $isBenar ? $kejuruan['benar']++ : $kejuruan['salah']++;
+                    $isBenar ? $jurusanKedua['benar']++ : $jurusanKedua['salah']++;
                 }
             }
 
             // Hitung Skor (Skala 100)
             $skor_umum = $totalUmum > 0 ? round(($umum['benar'] / $totalUmum) * 100, 2) : 0;
-            $skor_kejuruan = $totalKejuruan > 0 ? round(($kejuruan['benar'] / $totalKejuruan) * 100, 2) : 0;
-            
-            $total_soal = $totalUmum + $totalKejuruan;
-            $total_benar = $umum['benar'] + $kejuruan['benar'];
+            $skor_kejuruan_pertama = $totalJurusanPertama > 0 ? round(($jurusanPertama['benar'] / $totalJurusanPertama) * 100, 2) : 0;
+            $skor_kejuruan_kedua = $totalJurusanKedua > 0 ? round(($jurusanKedua['benar'] / $totalJurusanPertama) * 100, 2) : 0;
+
+            $total_soal = $totalUmum + $totalJurusanPertama + $totalJurusanKedua;
+            $total_benar = $umum['benar'] + $jurusanPertama['benar'] + $jurusanKedua['benar'];
             $nilai_total = $total_soal > 0 ? round(($total_benar / $total_soal) * 100, 2) : 0;
 
             return [
@@ -98,11 +103,13 @@ class ExamController extends Controller
                 'nama' => $firstItem->account->nama ?? 'N/A',
                 'nomor_registrasi' => $firstItem->account->nomor_registrasi ?? '-',
                 'umum' => $umum,
-                'kejuruan' => $kejuruan,
+                'jurusan_pertama' => $jurusanPertama,
+                'jurusan_kedua' => $jurusanKedua,
                 'soal_umum' => $totalUmum,
-                'soal_kejuruan' => $totalKejuruan,
+                'soal_kejuruan' => $totalJurusanPertama,
                 'skor_umum' => $skor_umum,
-                'skor_kejuruan' => $skor_kejuruan,
+                'skor_jurusan_pertama' => $skor_kejuruan_pertama,
+                'skor_jurusan_kedua' => $skor_kejuruan_kedua,
                 'total_benar' => $total_benar,
                 'total_soal' => $total_soal,
                 'nilai' => $nilai_total,
