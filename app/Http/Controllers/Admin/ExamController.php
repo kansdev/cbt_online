@@ -92,7 +92,7 @@ class ExamController extends Controller
             // Hitung Skor (Skala 100)
             $skor_umum = $totalUmum > 0 ? round(($umum['benar'] / $totalUmum) * 100, 2) : 0;
             $skor_kejuruan_pertama = $totalJurusanPertama > 0 ? round(($jurusanPertama['benar'] / $totalJurusanPertama) * 100, 2) : 0;
-            $skor_kejuruan_kedua = $totalJurusanKedua > 0 ? round(($jurusanKedua['benar'] / $totalJurusanPertama) * 100, 2) : 0;
+            $skor_kejuruan_kedua = $totalJurusanKedua > 0 ? round(($jurusanKedua['benar'] / $totalJurusanKedua) * 100, 2) : 0;
 
             $total_soal = $totalUmum + $totalJurusanPertama + $totalJurusanKedua;
             $total_benar = $umum['benar'] + $jurusanPertama['benar'] + $jurusanKedua['benar'];
@@ -106,7 +106,8 @@ class ExamController extends Controller
                 'jurusan_pertama' => $jurusanPertama,
                 'jurusan_kedua' => $jurusanKedua,
                 'soal_umum' => $totalUmum,
-                'soal_kejuruan' => $totalJurusanPertama,
+                'soal_kejuruan_pertama' => $totalJurusanPertama,
+                'soal_kejuruan_kedua' => $totalJurusanKedua,
                 'skor_umum' => $skor_umum,
                 'skor_jurusan_pertama' => $skor_kejuruan_pertama,
                 'skor_jurusan_kedua' => $skor_kejuruan_kedua,
