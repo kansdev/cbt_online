@@ -16,7 +16,7 @@ use App\Exports\KoreksiExport;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ParticipantController extends Controller
-{    
+{
     public function peserta()
     {
         // Ambil data peserta dengan pagination 20 data per halaman dan urutkan berdasarkan nama
@@ -30,7 +30,7 @@ class ParticipantController extends Controller
     {
         // Ambil data peserta yang aktif dengan pagination 20 data per halaman dan urutkan
         $peserta_aktif = Account::orderBy('nama', 'asc')->paginate(100);
-        
+
         // Tampilkan halaman peserta aktif dengan data peserta aktif
         return view('admin.pages.aktif_peserta', compact('peserta_aktif'));
         // dd($peserta_aktif);
@@ -43,7 +43,7 @@ class ParticipantController extends Controller
         return view('admin.pages.reset', compact('peserta'));
     }
 
-    public function tambah_peserta(Request $request) 
+    public function tambah_peserta(Request $request)
     {
         try {
             $validate = $request->validate([
@@ -51,10 +51,9 @@ class ParticipantController extends Controller
                 'nama' => 'required',
                 'nisn' => 'required',
                 'jenis_kelamin' => 'required',
-                'jurusan' => 'required',
-                'kategori' => 'required',
+                'jurusan_pertama' => 'required',
+                'jurusan_kedua' => 'required',
                 'jenis_umum' => 'required',
-                'jenis_kejuruan' => 'required',
                 'tanggal_lahir' => 'required',
                 'id_gelombang' => 'required',
                 'status' => 'required'
@@ -172,7 +171,13 @@ class ParticipantController extends Controller
 
             return redirect()->back()->with('success', 'Peserta berhasil diimpor!');
         } catch (\Exception $e) {
-            return redirect()->back()->with('failed', 'Peserta gagal diimpor! : ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
+            ]);
+            // return redirect()->back()->with('failed', 'Peserta gagal diimpor! : ' . $e->getMessage());
         }
 
     }
