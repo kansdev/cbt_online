@@ -32,41 +32,51 @@ class KoreksiExport implements FromCollection, WithHeadings, WithEvents, WithCus
             ->map(function($items) {
                 $benar = 0;
                 $salah = 0;
-                foreach($items as $item) {
-                    if($item->jawaban === $item->soal->kunci_jawaban) {
-                        $benar++;
-                    } else {
-                        $salah++;
-                    }
-                }
 
                 // TOTAL SOAL (bukan jumlah jawaban!)
                 // $jumlah_soal = Soal::count();
 
-                $jumlah_jawaban = Jawaban::where('id_siswa', $items[0]->id_siswa)->count();
+                $allJawabanSiswa = Jawaban::with('soal')->where('id_siswa', $items[0]->id_siswa)->get();
 
-                //Jumlah soal yang di jawab
-                $jumlah_soal_acak = SoalAcak::where('id_siswa', $items[0]->id_siswa)->count();
+                $totalUmum = SoalAcak::where('id_siswa', $items[0]->id_siswa)->where('tahap', 'umum')->count();
+                $totalJurusanPertama = SoalAcak::where('id_siswa', $items[0]->id_siswa)->where('tahap', 'kejuruan_pertama')->distinct('id_soal')->count('id_soal');
+                $totalJurusanKedua = SoalAcak::where('id_siswa', $items[0]->id_siswa)->where('tahap', 'kejuruan_kedua')->distinct('id_soal')->count('id_soal');
 
-                $soal_tidak_dijawab = 50 - $jumlah_soal_acak;
-                $nilai = 50 > 0
-                    ? round(($benar / 50) * 100, 2)
-                    : 0;
+                $umum = ['benar' => 0, 'salah' => 0, 'total' => $totalUmum];
+                $jurusanPertama = ['benar' => 0, 'salah' => 0, 'total' => $totalJurusanPertama];
+                $jurusanKedua = ['benar' => 0, 'salah' => 0, 'total' => $totalJurusanKedua];
+                foreach($allJawabanSiswa as $item) {
+                    // Gunakan optional() untuk menghindari error jika soal terhapus di DB
+                    $kunci = optional($item->soal)->kunci_jawaban;
+                    $isBenar = $item->jawaban === $kunci;
+
+                    if ($item->tahap === 'umum') {
+                        $isBenar ? $umum['benar']++ : $umum['salah']++;
+                    } else if($item->tahap === 'kejuruan_pertama') {
+                        $isBenar ? $jurusanPertama['benar']++ : $jurusanPertama['salah']++;
+                    } else {
+                        $isBenar ? $jurusanKedua['benar']++ : $jurusanKedua['salah']++;
+                    }
+                }
+                $skor_umum = $totalUmum > 0 ? round(($umum['benar'] / $totalUmum) * 100, 2) : 0;
+                $skor_kejuruan_pertama = $totalJurusanPertama > 0 ? round(($jurusanPertama['benar'] / $totalJurusanPertama) * 100, 2) : 0;
+                $skor_kejuruan_kedua = $totalJurusanKedua > 0 ? round(($jurusanKedua['benar'] / $totalJurusanKedua) * 100, 2) : 0;
+
+                $total_soal = $totalUmum + $totalJurusanPertama + $totalJurusanKedua;
 
                 return [
                     'id_siswa' => $items[0]->id_siswa,
                     'nama' => $items[0]->account->nama,
-                    'jumlah_soal' => 50,
-                    'benar' => $benar,
-                    'salah' => $salah,
-                    'soal_tidak_dijawab' => $soal_tidak_dijawab ?? '0',
-                    'nilai' => $nilai
+                    'jumlah_soal' => $total_soal,
+                    'nilai_umum' => $skor_umum,
+                    'nilai_jurusan_pertama' => $skor_kejuruan_pertama,
+                    'nilai_jurusan_kedua' => $skor_kejuruan_kedua
                 ];
             });
     }
 
     public function headings(): array {
-        return ["ID Siswa", "Nama Lengkap", "Jumlah Soal", "Jawaban Benar", "Jawaban Salah", "Tidak Menjawab", "Nilai"];
+        return ["ID Siswa", "Nama Lengkap", "Jumlah Soal", "Nilai Umum", "Nilai Jurusan Pertama", "Nilai Jurusan Kedua"];
     }
 
     public function registerEvents(): array {
@@ -84,7 +94,7 @@ class KoreksiExport implements FromCollection, WithHeadings, WithEvents, WithCus
                 $sheet->setCellValue('A4', 'Tanggal Tes');
                 $sheet->setCellValue('B4', ': ' . date('d m Y'));
                 $sheet->setCellValue('A5', 'Gelombang');
-                $sheet->setCellValue('B5', ': Gelombang 3');
+                $sheet->setCellValue('B5', ': Gelombang 4');
                 $sheet->getStyle('A4:A5')->getFont()->setBold(true);
 
                 // Buat border
