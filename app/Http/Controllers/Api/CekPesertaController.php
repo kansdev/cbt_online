@@ -28,18 +28,17 @@ class CekPesertaController extends Controller
         ->where('id_gelombang', $validate['gelombang'])
         ->first();
 
-        
         if(!$siswa) return response()->json([
             'message' => "Peserta dengan NISN {$validate['nisn']} tidak ditemukan. Hubungi operator"
         ], 404);
-            
+
         $ujian = Ujian::where('id_siswa', $siswa->id)->first();
 
         if($siswa->id_gelombang != $validate['gelombang']) return response()->json([
             'message' => 'Akun anda belum masuk pada jadwal gelombang manapun. Hubungi operator'
         ], 400);
 
-        $gelombang = $this->cek_gelombang($validate['nisn']);           
+        $gelombang = $this->cek_gelombang($validate['nisn']);
         if(!$gelombang) return response()->json([
             'message' => 'Akun pada gelombang tersebut belum dapat digunakan. Hubungi operator'
         ], 400);
@@ -110,7 +109,7 @@ class CekPesertaController extends Controller
                 'jenis_umum' => $siswa->jenis_umum,
                 'jenis_kejuruan' => $siswa->jenis_kejuruan,
                 'status' => $siswa->status,
-                'jumlah_soal' => $soal,
+                'jumlah_soal' => $jumlah_soal,
                 'datetime' => $datetime
             ]
         ]);

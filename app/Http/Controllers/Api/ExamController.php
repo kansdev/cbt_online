@@ -26,7 +26,7 @@ class ExamController extends Controller
     {
         try {
             $siswa = Account::findOrFail($id_siswa);
-        
+
             // 1. Ambil atau buat data ujian
             $ujian = Ujian::firstOrCreate(
                 ['id_siswa' => $id_siswa],
@@ -39,10 +39,13 @@ class ExamController extends Controller
             );
 
             // 2. PAKSA GENERATE jika soal belum ada
-            $soal_count = SoalAcak::where('id_siswa', $id_siswa)->where('tahap', $ujian->tahap)->count();
+            $soal_count = SoalAcak::where('id_siswa', $id_siswa)
+                ->where('tahap', $ujian->tahap)
+                ->count();
+
             if($soal_count == 0) {
                 $this->generate_soal($siswa, $ujian->tahap);
-                
+
                 // Cek lagi setelah generate, jika masih 0 berarti database soal kamu kosong untuk kategori tersebut
                 $recheck = SoalAcak::where('id_siswa', $id_siswa)->where('tahap', $ujian->tahap)->count();
                 if($recheck == 0) {
@@ -53,6 +56,12 @@ class ExamController extends Controller
                     ], 500);
                 }
             }
+
+            // Update lock generate soal
+            logger()->info('GENERATE', [
+                'siswa' => $siswa->id,
+                'tahap' => $ujian->tahap
+            ]);
 
             return response()->json([
                 'status' => 'success',
@@ -67,7 +76,7 @@ class ExamController extends Controller
                 'file' => $e->getFile()
             ], 500);
         }
-        
+
     }
 
     public function halaman_soal(Request $request, $id_siswa)
@@ -164,6 +173,7 @@ class ExamController extends Controller
         } else {
 
             $id_soal_terjawab = Jawaban::where('id_siswa', $id_siswa)
+                ->where('tahap', $ujian->tahap) // Filter tahap ujian
                 ->pluck('id_soal');
 
             $soal_acak = SoalAcak::with('soal')
@@ -245,9 +255,9 @@ class ExamController extends Controller
                 ->where('tahap', 'umum')
                 ->distinct('id_soal')
                 ->count('id_soal');
-             
+
             // Logger
-            logger()->info([
+            logger()->info("Catatan total soal umum dan jumlah jawaban", [
                 'total_soal_umum' => $soal_umum,
                 'jumlah_jawab' => $jumlah_jawab,
             ]);
@@ -280,7 +290,7 @@ class ExamController extends Controller
                 $ujian->waktu_selesai_umum
             )->diffInSeconds(now());
 
-            logger()->info([
+            logger()->info("Catatan jeda waktu ", [
                 'detik_jeda' => $detikLalu
             ]);
 
@@ -293,13 +303,17 @@ class ExamController extends Controller
                 $ujian->refresh();
 
                 // generate soal kejuruan jika belum ada
-                $cekSoal = SoalAcak::where('id_siswa', $siswa->id)
-                    ->where('tahap', 'kejuruan_pertama')
-                    ->count();
+                // Update mencegah gagal update dan duplikasi data
+                DB::transaction(function() use ($siswa) {
+                    $cekSoal = SoalAcak::where('id_siswa', $siswa->id)
+                        ->where('tahap', 'kejuruan_pertama')
+                        ->lockForUpdate()
+                        ->count();
 
-                if ($cekSoal == 0) {
-                    $this->generate_soal($siswa, 'kejuruan_pertama');
-                }
+                    if ($cekSoal == 0) {
+                        $this->generate_soal($siswa, 'kejuruan_pertama');
+                    }
+                });
 
                 logger()->info('PINDAH KE KEJURUAN PERTAMA');
                 return;
@@ -323,7 +337,7 @@ class ExamController extends Controller
                 ->distinct('id_soal')
                 ->count('id_soal');
 
-            logger()->info([
+            logger()->info("Catatan total soal kejuruan pertama dan jumlah jawaban ", [
                 'total_soal_kejuruan_pertama' => $soal_kejuruan_pertama,
                 'jumlah_jawab' => $jumlah_jawab,
             ]);
@@ -356,7 +370,7 @@ class ExamController extends Controller
                 $ujian->waktu_selesai_jurusan_pertama
             )->diffInSeconds(now());
 
-            logger()->info([
+            logger()->info("Catatan jeda waktu ", [
                 'detik_jeda' => $detikLalu
             ]);
 
@@ -369,13 +383,16 @@ class ExamController extends Controller
                 $ujian->refresh();
 
                 // generate soal kejuruan jika belum ada
-                $cekSoal = SoalAcak::where('id_siswa', $siswa->id)
-                    ->where('tahap', 'kejuruan_kedua')
-                    ->count();
+                DB::transaction(function() use ($siswa) {
+                    $cekSoal = SoalAcak::where('id_siswa', $siswa->id)
+                        ->where('tahap', 'kejuruan_kedua')
+                        ->lockForUpdate()
+                        ->count();
 
-                if ($cekSoal == 0) {
-                    $this->generate_soal($siswa, 'kejuruan_kedua');
-                }
+                    if ($cekSoal == 0) {
+                        $this->generate_soal($siswa, 'kejuruan_kedua');
+                    }
+                });
 
                 logger()->info('PINDAH KE KEJURUAN KEDUA');
                 return;
@@ -388,15 +405,35 @@ class ExamController extends Controller
         $kategori = $this->get_kategori_soal($siswa, $tahap);
 
         if (empty($kategori)) {
-            \Log::error("Kategori kosong untuk siswa: " . $siswa->id);
+            // Update log info
+            logger()->info('Kategori kosong ', [
+                'siswa' => $siswa->id,
+                'tahap' => $tahap,
+                'time' => now()->format('H:i:s.u')
+            ]);
             return;
         }
 
         // Soal dengan
-        $soal = Soal::whereIn('kategori', $kategori)->inRandomOrder()->get();
+        if($tahap == 'umum') {
+            $soal = Soal::whereIn('kategori', $kategori)
+                ->inRandomOrder()
+                ->get();
+        } else {
+            $soal = Soal::whereIn('kategori', $kategori)
+                ->inRandomOrder()
+                ->limit(10)
+                ->get();
+        }
 
         if ($soal->isEmpty()) {
-            \Log::error("Bank soal kosong untuk kategori: " . implode(',', $kategori));
+            // Update log info
+            logger()->info('Bank soal kosong untuk kategori : ' . implode(',', $kategori), [
+                'siswa' => $siswa->id,
+                'tahap' => $tahap,
+                'kategori' => implode(',', $kategori),
+                'time' => now()->format('H:i:s.u')
+            ]);
             return;
         }
 
@@ -414,8 +451,8 @@ class ExamController extends Controller
     {
         $jurusan_1 = strtoupper($siswa->jurusan_pertama);
         $jurusan_2 = strtoupper($siswa->jurusan_kedua);
-        // Debug: 
-        \Log::info("Jurusan Siswa: " . $jurusan_1 . " dan " . $jurusan_2 );
+        // Debug:
+        logger()->info("Jurusan Siswa: " . $jurusan_1 . " dan " . $jurusan_2 );
         switch ($tahap) {
             case 'umum':
                 return match ($jurusan_1) {
@@ -437,7 +474,7 @@ class ExamController extends Controller
                     'AK'   => ['jurusan_ak'],
                     default => []
                 };
-            
+
             case 'kejuruan_kedua':
                 return match($jurusan_2) {
                     'PPLG' => ['jurusan_rpl'],
@@ -457,10 +494,10 @@ class ExamController extends Controller
     public function simpan_jawaban(Request $request)
     {
         $ujian = Ujian::where('id_siswa', $request->id_siswa)->first();
-        
+
         if(!$ujian || !$ujian->mulai_at) {
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Ujian tidak valid'
             ], 400);
         }
@@ -475,7 +512,7 @@ class ExamController extends Controller
                 ]);
             }
             return response()->json([
-                'status' => false, 
+                'status' => false,
                 'message' => 'Waktu habis, ujian sudah selesai'
             ], 400);
         }
@@ -553,7 +590,7 @@ class ExamController extends Controller
 
             $ujian->refresh();
 
-            logger()->info([
+            logger()->info("Catatan ", [
                 'tahap' => $ujian->tahap
             ]);
 
@@ -580,7 +617,7 @@ class ExamController extends Controller
                     ->distinct('id_soal')
                     ->count('id_soal');
 
-                logger()->info([
+                logger()->info("Catatan total kejuruan pertama, jawaban kejuruan pertama dan total kejuruan kedua dan jawawban kejuruan kedua", [
                     'totalKejuruanPertama' => $totalKejuruanPertama,
                     'jawabanKejuruanPertama' => $jawabanKejuruanPertama,
                     'totalKejuruanKedua' => $totalKejuruanKedua,
@@ -661,7 +698,7 @@ class ExamController extends Controller
         Jawaban::where('id_siswa', $id_siswa)->delete();
 
         return response()->json([
-            'status' => true, 
+            'status' => true,
             'message' => 'Ujian berhasil direset'
         ], 200);
     }
@@ -701,5 +738,5 @@ class ExamController extends Controller
             'skor' => $skor
         ];
     }
-    
+
 }
